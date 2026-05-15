@@ -1,0 +1,34 @@
+@font-face {
+  font-family: 'Segmented Choice Story Sans';
+  src: url('./fonts/nunito-sans-regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Segmented Choice Story Sans';
+  src: url('./fonts/nunito-sans-bold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root,
+html,
+body,
+#root,
+#storybook-root {
+  --rsc-story-font-family: 'Segmented Choice Story Sans', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  font-family: var(--rsc-story-font-family) !important;
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.95),
+    rgba(243, 246, 252, 0.88) 52%,
+    #eef2f8 100%
+  );
+}
+
+body {
+  margin: 0;
+}

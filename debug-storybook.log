@@ -1,0 +1,25 @@
+[09:05:46.337] [INFO] storybook v10.3.5
+[09:05:46.675] [DEBUG] Getting package.json info for /Users/pavel/__dev/react-segmented-choice/package.json...
+[09:05:47.398] [WARN] 🚨 Unable to index ./src/stories/internal-tests/SegmentedChoiceInteractions.stories.tsx:
+  SyntaxError: Argument name clash. (48:2)
+    at constructor (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:12171:21)
+    at Parser.raise (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:16356:71)
+    at Parser.checkLVal (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:16978:58)
+    at Parser.checkLVal (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:17000:26)
+    at Parser.checkLVal (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:17000:26)
+    at Parser.checkLVal (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:16999:27)
+    at Parser.checkParams (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:19742:16)
+    at Parser.<anonymous> (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:19724:18)
+    at Parser.parseBlockOrModuleBlockBody (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:20480:26)
+    at Parser.parseBlockBody (file:///Users/pavel/__dev/react-segmented-choice/node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-JXXWBFBF.js:20464:14)
+[09:05:47.403] [ERROR] Error: Unable to index ./src/stories/internal-tests/SegmentedChoiceInteractions.stories.tsx
+    at _StoryIndexGenerator.getIndexAndStats (file://./node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/core-server/index.js:6282:15)
+    at async _StoryIndexGenerator.getIndex (file://./node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/core-server/index.js:6271:13)
+    at async Object.experimental_serverChannel (file://./node_modules/.pnpm/@storybook+addon-vitest@10.3.5_@vitest+browser-playwright@4.1.4_@vitest+browser@4.1.4_@_e70f5c6c77b556168a3b1dd0c1913f24/node_modules/@storybook/addon-vitest/dist/preset.js:464:14)
+    at async buildDevStandalone (file://./node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/core-server/index.js:8027:32)
+    at async withTelemetry (file://./node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/_node-chunks/chunk-FIR43JGQ.js:225:12)
+    at async dev (file://./node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/bin/core.js:2736:3)
+    at async _Command.<anonymous> (file://./node_modules/.pnpm/storybook@10.3.5_@testing-library+dom@10.4.1_react-dom@19.2.5_react@19.2.5__react@19.2.5/node_modules/storybook/dist/bin/core.js:2806:92)
+[09:05:47.405] [WARN] Broken build, fix the error above.
+You may need to refresh the browser.
+[09:08:29.309] [PROMPT] Would you like to send anonymous crash reports to improve Storybook and fix bugs faster? {"choice":true}
