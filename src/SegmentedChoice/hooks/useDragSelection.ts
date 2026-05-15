@@ -1,13 +1,35 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getAxisBounds, getAxisCoordinate, type IndexedAxisBounds } from '../internal/geometry';
+import {
+  findNearestEnabledIndex,
+  getAxisBounds,
+  getAxisCoordinate,
+  type IndexedAxisBounds,
+  type RelativeBoxLayout,
+} from '../internal/geometry';
 import { getDragProjection } from '../internal/getDragProjection';
 import { measureOptionRect } from '../internal/measureOptionRect';
 import type { SegmentedChoiceOption, SegmentedChoiceValue } from '../SegmentedChoice.types';
 import { measureIndicatorLayout } from './useIndicatorLayout';
 
 const DRAG_RELEASED_DURATION_MS = 320;
+
+function getLayoutCenterCoordinate({
+  layout,
+  listElement,
+  orientation,
+}: {
+  layout: RelativeBoxLayout;
+  listElement: HTMLDivElement;
+  orientation: 'horizontal' | 'vertical';
+}) {
+  const listRect = listElement.getBoundingClientRect();
+
+  return orientation === 'horizontal'
+    ? listRect.left - listElement.scrollLeft + layout.x + layout.width / 2
+    : listRect.top - listElement.scrollTop + layout.y + layout.height / 2;
+}
 
 export function useDragSelection<T extends SegmentedChoiceValue>({
   centerToOption,
@@ -220,14 +242,20 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
       const target = event.target as HTMLElement | null;
       const optionElement = target?.closest<HTMLLabelElement>('.rsc-option');
       const indicatorElement = target?.closest<HTMLElement>('.rsc-indicator');
+      const startsFromListSurface = !optionElement && !indicatorElement;
+      const pointerCoordinate = getAxisCoordinate(orientation, event.nativeEvent);
 
-      if (!optionElement && !(selectionMode === 'overlay' && indicatorElement)) {
-        return;
-      }
+      const clickedIndex = (() => {
+        if (optionElement) {
+          return optionRefs.current.findIndex(optionRef => optionRef === optionElement);
+        }
 
-      const clickedIndex = optionElement
-        ? optionRefs.current.findIndex(optionRef => optionRef === optionElement)
-        : selectedIndex;
+        if (selectionMode === 'overlay' && indicatorElement) {
+          return selectedIndex;
+        }
+
+        return findNearestEnabledIndex(pointerCoordinate, getEnabledBounds());
+      })();
 
       if (Number.isNaN(clickedIndex) || clickedIndex < 0 || options[clickedIndex]?.disabled) {
         return;
@@ -235,6 +263,7 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
 
       if (
         selectionMode === 'overlay' &&
+        optionElement &&
         !indicatorElement &&
         clickedIndex !== (selectedIndex >= 0 ? selectedIndex : clickedIndex)
       ) {
@@ -242,7 +271,9 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
       }
 
       const dragOriginIndex =
-        selectionMode === 'overlay' && selectedIndex >= 0 ? selectedIndex : clickedIndex;
+        (selectionMode === 'overlay' || startsFromListSurface) && selectedIndex >= 0
+          ? selectedIndex
+          : clickedIndex;
       const initialLayout = measureIndicatorLayout({
         activeIndex: dragOriginIndex,
         centerToOption,
@@ -270,19 +301,33 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
       activePointerIdRef.current = event.pointerId;
       activePointerElementRef.current = event.currentTarget;
       initialIndexRef.current = dragOriginIndex;
-      initialCoordinateRef.current = getAxisCoordinate(orientation, event.nativeEvent);
+      initialCoordinateRef.current = startsFromListSurface
+        ? getLayoutCenterCoordinate({
+            layout: initialLayout,
+            listElement: event.currentTarget,
+            orientation,
+          })
+        : pointerCoordinate;
       lastCoordinateRef.current = initialCoordinateRef.current;
       initialLayoutRef.current = initialLayout;
-      setDragLayout(initialLayoutRef.current);
+      const initialProjection = startsFromListSurface ? getProjection(pointerCoordinate) : null;
+
+      setDragLayout(initialProjection?.layout ?? initialLayoutRef.current);
       setDragging(true);
-      setDragPreviewing(false);
-      setPreviewIndex(clickedIndex);
+      setDragPreviewing(initialProjection !== null);
+      setPreviewIndex(
+        initialProjection?.resolvedIndex !== undefined && initialProjection.resolvedIndex >= 0
+          ? initialProjection.resolvedIndex
+          : clickedIndex
+      );
     },
     [
       centerToOption,
       clearDragReleasedTimeout,
       disabled,
       draggable,
+      getEnabledBounds,
+      getProjection,
       indicatorRef,
       inset,
       listRef,
@@ -301,6 +346,10 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (activePointerIdRef.current !== event.pointerId) {
         return;
+      }
+
+      if (event.cancelable) {
+        event.preventDefault();
       }
 
       const coordinate = getAxisCoordinate(orientation, event.nativeEvent);

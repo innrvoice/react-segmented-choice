@@ -1955,7 +1955,6 @@ export const GeometrySizing: ArchitectureStory = {
             <div className="sizing-row">
               <h2 className="architecture-card-title">Option size</h2>
               <div className="sizing-visual">
-                <span className="sizing-label">option box</span>
                 <SegmentedChoice
                   ariaLabel="Option size"
                   className="sizing-choice sizing-choice--option"
@@ -1979,7 +1978,6 @@ export const GeometrySizing: ArchitectureStory = {
             <div className="sizing-row">
               <h2 className="architecture-card-title">Anchor size</h2>
               <div className="sizing-visual">
-                <span className="sizing-label">anchor target</span>
                 <SegmentedChoice
                   ariaLabel="Anchor size"
                   className="sizing-choice sizing-choice--anchor"

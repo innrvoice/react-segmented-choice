@@ -35,6 +35,7 @@
   line-height: var(--rsc-line-height);
   letter-spacing: var(--rsc-letter-spacing);
   color: var(--rsc-text-color);
+  -webkit-tap-highlight-color: var(--rsc-tap-highlight-color, transparent);
   display: inline-block;
   max-width: 100%;
 }
@@ -80,11 +81,11 @@
 }
 
 .rsc-root[data-orientation='horizontal'] .rsc-list {
-  touch-action: pan-y;
+  touch-action: var(--_rsc-list-touch-action, pan-y);
 }
 
 .rsc-root[data-orientation='vertical'] .rsc-list {
-  touch-action: pan-x;
+  touch-action: var(--_rsc-list-touch-action, pan-x);
 }
 
 .rsc-root[data-unstyled='false'] .rsc-list {

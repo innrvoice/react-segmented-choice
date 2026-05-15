@@ -16,6 +16,7 @@ export function buildSegmentedChoiceRuntimeRule({
   indicatorWidth,
   instanceId,
   listCursor,
+  listTouchAction,
   optionSize,
   resolvedOptionSizing,
   resolvedTrackLayout,
@@ -33,6 +34,7 @@ export function buildSegmentedChoiceRuntimeRule({
   indicatorWidth: number | undefined;
   instanceId: string;
   listCursor: string | undefined;
+  listTouchAction: string | undefined;
   optionSize: number | undefined;
   resolvedOptionSizing: 'content' | 'equal' | 'fixed';
   resolvedTrackLayout: 'center-span' | 'container';
@@ -62,6 +64,7 @@ export function buildSegmentedChoiceRuntimeRule({
       ['--_rsc-indicator-cursor', indicatorCursor],
       ['--_rsc-indicator-color', sanitizeAccentColor(indicatorColor)],
       ['--_rsc-list-cursor', listCursor],
+      ['--_rsc-list-touch-action', listTouchAction],
       [
         '--_rsc-track-x',
         resolvedTrackLayout === 'center-span' && trackLayout.visible
