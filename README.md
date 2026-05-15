@@ -1,7 +1,7 @@
 # react-segmented-choice
 
-[![codecov](https://codecov.io/gh/innrvoice/react-segmented-choice/branch/master/graph/badge.svg)](https://codecov.io/gh/innrvoice/react-segmented-choice)
-[![bundle size](https://codecov.io/github/innrvoice/react-segmented-choice/branch/master/graph/bundle/react-segmented-choice-esm/badge.svg)](https://app.codecov.io/github/innrvoice/react-segmented-choice/bundles/master/react-segmented-choice-esm)
+[![codecov](https://codecov.io/gh/innrvoice/react-segmented-choice/branch/main/graph/badge.svg)](https://codecov.io/gh/innrvoice/react-segmented-choice)
+[![bundle size](https://codecov.io/github/innrvoice/react-segmented-choice/branch/main/graph/bundle/react-segmented-choice-esm/badge.svg)](https://app.codecov.io/github/innrvoice/react-segmented-choice/bundles/main/react-segmented-choice-esm)
 
 `react-segmented-choice` is an accessible segmented control for immediate single-choice selection in React.
 
