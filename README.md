@@ -293,7 +293,7 @@ The hosted Storybook contains practical customization patterns, architecture sto
 
 It covers:
 
-- getting-started usage and state variants
+- baseline variants and state examples
 - geometry and indicator architecture
 - CSS-first customization patterns
 - rails, thumbnails, filters and toggle-like controls

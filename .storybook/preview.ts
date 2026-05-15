@@ -11,7 +11,7 @@ const preview: Preview = {
           'Showcase',
           ['SegmentedChoice Demo'],
           'Basics',
-          ['Getting Started', 'Variants', 'States'],
+          ['Variants', 'States'],
           'Architecture',
           ['Geometry And Styling'],
           'Customization',
