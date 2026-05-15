@@ -4,7 +4,6 @@ import '../src/SegmentedChoice/SegmentedChoice.css';
 import './preview.css';
 
 const preview: Preview = {
-  tags: ['autodocs'],
   parameters: {
     options: {
       storySort: {
