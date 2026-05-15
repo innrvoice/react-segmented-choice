@@ -248,6 +248,12 @@ export function registerSegmentedChoiceStateContractSuite() {
     expect(runtimeStyle.textContent).not.toContain('--rsc-container-offset');
   });
 
+  it('suppresses native mobile tap highlight by default with a CSS opt-in hook', () => {
+    expect(segmentedChoiceCss).toContain(
+      '-webkit-tap-highlight-color: var(--rsc-tap-highlight-color, transparent);'
+    );
+  });
+
   it('uses internal option sizing and distribution routing attrs', () => {
     const { container: defaultContainer } = render(
       <SegmentedChoice ariaLabel="Default range" options={baseOptions} />

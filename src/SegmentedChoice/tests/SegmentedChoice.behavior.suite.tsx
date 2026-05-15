@@ -175,6 +175,242 @@ export function registerSegmentedChoiceBehaviorSuite() {
     expect((getRadio('Month') as HTMLInputElement).checked).toBe(true);
   });
 
+  it('prevents default during an active drag move', () => {
+    const { container } = render(
+      <SegmentedChoice ariaLabel="Range" defaultValue="day" options={baseOptions} />
+    );
+
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    Object.assign(list, {
+      setPointerCapture: vi.fn(),
+    });
+    setElementRect(list, { left: 0, top: 0, width: 280, height: 48 });
+    setRectsForAxis(labels, 'horizontal', { size: 84, gap: 12, crossSize: 48 });
+
+    fireEvent.pointerDown(labels[0] as Element, {
+      button: 0,
+      clientX: 16,
+      clientY: 24,
+      pointerId: 101,
+    });
+
+    const moveWasNotCancelled = fireEvent.pointerMove(list, {
+      cancelable: true,
+      clientX: 180,
+      clientY: 24,
+      pointerId: 101,
+    });
+
+    expect(moveWasNotCancelled).toBe(false);
+  });
+
+  it('commits the nearest enabled option when tapping the underlay list surface', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Range"
+        defaultValue="day"
+        onValueChange={onValueChange}
+        options={baseOptions}
+      />
+    );
+
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    Object.assign(list, {
+      setPointerCapture: vi.fn(),
+    });
+    setElementRect(list, { left: 0, top: 0, width: 360, height: 48 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 40, height: 48 });
+    setElementRect(labels[1] as Element, { left: 160, top: 0, width: 40, height: 48 });
+    setElementRect(labels[2] as Element, { left: 320, top: 0, width: 40, height: 48 });
+
+    fireEvent.pointerDown(list, {
+      button: 0,
+      clientX: 330,
+      clientY: 24,
+      pointerId: 102,
+    });
+    fireEvent.pointerUp(list, {
+      clientX: 330,
+      clientY: 24,
+      pointerId: 102,
+    });
+
+    expect(onValueChange).toHaveBeenLastCalledWith('month');
+    expect((getRadio('Month') as HTMLInputElement).checked).toBe(true);
+  });
+
+  it('drags from the underlay list surface and commits by coordinate', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Range"
+        defaultValue="day"
+        onValueChange={onValueChange}
+        options={baseOptions}
+      />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    Object.assign(list, {
+      setPointerCapture: vi.fn(),
+    });
+    setElementRect(list, { left: 0, top: 0, width: 360, height: 48 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 40, height: 48 });
+    setElementRect(labels[1] as Element, { left: 160, top: 0, width: 40, height: 48 });
+    setElementRect(labels[2] as Element, { left: 320, top: 0, width: 40, height: 48 });
+
+    fireEvent.pointerDown(list, {
+      button: 0,
+      clientX: 170,
+      clientY: 24,
+      pointerId: 103,
+    });
+
+    expect(root.dataset.dragging).toBe('true');
+    expect((labels[1] as HTMLElement).dataset.previewed).toBe('true');
+
+    fireEvent.pointerMove(list, {
+      clientX: 330,
+      clientY: 24,
+      pointerId: 103,
+    });
+    fireEvent.pointerUp(list, {
+      clientX: 330,
+      clientY: 24,
+      pointerId: 103,
+    });
+
+    expect(onValueChange).toHaveBeenLastCalledWith('month');
+    expect((getRadio('Month') as HTMLInputElement).checked).toBe(true);
+  });
+
+  it('commits the nearest enabled option when tapping an overlay rail surface', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Steps"
+        defaultValue="zero"
+        optionSizing="content"
+        onValueChange={onValueChange}
+        options={[
+          { value: 'zero', label: '0' },
+          { value: 'one', label: '1', disabled: true },
+          { value: 'two', label: '2' },
+          { value: 'three', label: '3' },
+        ]}
+        geometry={{
+          mode: 'overlay',
+          indicator: {
+            content: 'none',
+            size: 15,
+            style: 'fill',
+          },
+          track: {
+            layout: 'center-span',
+            style: 'none',
+          },
+        }}
+      />
+    );
+
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    Object.assign(list, {
+      setPointerCapture: vi.fn(),
+    });
+    setElementRect(list, { left: 0, top: 0, width: 315, height: 40 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 15, height: 40 });
+    setElementRect(labels[1] as Element, { left: 100, top: 0, width: 15, height: 40 });
+    setElementRect(labels[2] as Element, { left: 200, top: 0, width: 15, height: 40 });
+    setElementRect(labels[3] as Element, { left: 300, top: 0, width: 15, height: 40 });
+
+    fireEvent.pointerDown(list, {
+      button: 0,
+      clientX: 112,
+      clientY: 20,
+      pointerId: 104,
+    });
+    fireEvent.pointerUp(list, {
+      clientX: 112,
+      clientY: 20,
+      pointerId: 104,
+    });
+
+    expect(onValueChange).toHaveBeenLastCalledWith('two');
+    expect((getRadio('2') as HTMLInputElement).checked).toBe(true);
+  });
+
+  it('drags from the overlay rail surface and commits by coordinate', () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Steps"
+        defaultValue="zero"
+        optionSizing="content"
+        onValueChange={onValueChange}
+        options={[
+          { value: 'zero', label: '0' },
+          { value: 'one', label: '1' },
+          { value: 'two', label: '2' },
+          { value: 'three', label: '3' },
+        ]}
+        geometry={{
+          mode: 'overlay',
+          indicator: {
+            content: 'none',
+            size: 15,
+            style: 'fill',
+          },
+          track: {
+            layout: 'center-span',
+            style: 'none',
+          },
+        }}
+      />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    Object.assign(list, {
+      setPointerCapture: vi.fn(),
+    });
+    setElementRect(list, { left: 0, top: 0, width: 315, height: 40 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 15, height: 40 });
+    setElementRect(labels[1] as Element, { left: 100, top: 0, width: 15, height: 40 });
+    setElementRect(labels[2] as Element, { left: 200, top: 0, width: 15, height: 40 });
+    setElementRect(labels[3] as Element, { left: 300, top: 0, width: 15, height: 40 });
+
+    fireEvent.pointerDown(list, {
+      button: 0,
+      clientX: 205,
+      clientY: 20,
+      pointerId: 105,
+    });
+
+    expect(root.dataset.dragging).toBe('true');
+    expect((labels[2] as HTMLElement).dataset.previewed).toBe('true');
+
+    fireEvent.pointerMove(list, {
+      clientX: 305,
+      clientY: 20,
+      pointerId: 105,
+    });
+    fireEvent.pointerUp(list, {
+      clientX: 305,
+      clientY: 20,
+      pointerId: 105,
+    });
+
+    expect(onValueChange).toHaveBeenLastCalledWith('three');
+    expect((getRadio('3') as HTMLInputElement).checked).toBe(true);
+  });
+
   it('shows a visibly moving indicator while dragging', async () => {
     const { container } = render(
       <SegmentedChoice ariaLabel="Range" defaultValue="day" options={baseOptions} />
@@ -1795,6 +2031,31 @@ export function registerSegmentedChoiceBehaviorSuite() {
     expect(
       getCssVar(container.querySelector('.rsc-root') as HTMLDivElement, '--_rsc-list-cursor')
     ).toBe('pointer');
+  });
+
+  it('sets touch-action none while list drag is enabled', () => {
+    const { container } = render(
+      <SegmentedChoice ariaLabel="Range" defaultValue="day" options={baseOptions} />
+    );
+
+    expect(
+      getCssVar(container.querySelector('.rsc-root') as HTMLDivElement, '--_rsc-list-touch-action')
+    ).toBe('none');
+  });
+
+  it('keeps orientation pan behavior when draggable is false', () => {
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Range"
+        defaultValue="day"
+        draggable={false}
+        options={baseOptions}
+      />
+    );
+
+    expect(
+      getCssVar(container.querySelector('.rsc-root') as HTMLDivElement, '--_rsc-list-touch-action')
+    ).toBe('');
   });
 
   it('does not expose interactive cursors when the control is disabled', () => {

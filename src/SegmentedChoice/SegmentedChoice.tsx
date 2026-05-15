@@ -356,6 +356,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
         : 'pointer';
   const indicatorCursor = interactiveCursor;
   const listCursor = interactiveCursor;
+  const listTouchAction = !disabled && draggable ? 'none' : undefined;
 
   useLayoutEffect(() => {
     optionRefs.current.length = options.length;
@@ -400,6 +401,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     indicatorWidth: hasSelectionWidth ? indicatorWidth : undefined,
     instanceId,
     listCursor,
+    listTouchAction,
     optionSize,
     resolvedOptionSizing,
     resolvedTrackLayout,
