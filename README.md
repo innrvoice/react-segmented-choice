@@ -358,4 +358,4 @@ CI runs formatting, lint, unit coverage, package build, public contract checks, 
 ## Supported Versions
 
 - React: `^18.2.0 || ^19.0.0`
-- Node: `>=20.19.0`
+- Node: `>=22.13.0`

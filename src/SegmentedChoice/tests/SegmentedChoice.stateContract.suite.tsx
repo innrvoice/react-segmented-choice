@@ -5,7 +5,29 @@ import React from 'react';
 import { act } from 'react';
 import { expect, it, vi } from 'vitest';
 
+import {
+  getFirstEnabledValue,
+  getNonTextOptionsMissingAriaLabel,
+  hasReadableTextLabel,
+  isSelectableValue,
+  stringifyValue,
+  validateOptionsStructure,
+} from '../internal/validation';
 import { SegmentedChoice } from '../SegmentedChoice';
+import {
+  __resetSegmentedChoiceWarnings,
+  warnInvalidDefaultValue,
+  warnMissingAriaLabel,
+} from '../SegmentedChoice.warnings';
+import {
+  SEGMENTED_CHOICE_COLOR_TOKENS,
+  SEGMENTED_CHOICE_FONT_FAMILY,
+  SEGMENTED_CHOICE_SIZE_TOKENS,
+  SEGMENTED_CHOICE_TYPOGRAPHY_TOKENS,
+  getSegmentedChoiceColorTokens,
+  getSegmentedChoiceSizeTokens,
+  getSegmentedChoiceTypographyTokens,
+} from '../tokens';
 import {
   baseOptions,
   getCssVar,
@@ -18,6 +40,98 @@ import {
 const segmentedChoiceCss = readFileSync('src/SegmentedChoice/SegmentedChoice.css', 'utf8');
 
 export function registerSegmentedChoiceStateContractSuite() {
+  it('keeps the design token helpers aligned with the exported token objects', () => {
+    expect(SEGMENTED_CHOICE_FONT_FAMILY).toContain('-apple-system');
+    expect(getSegmentedChoiceTypographyTokens()).toBe(SEGMENTED_CHOICE_TYPOGRAPHY_TOKENS);
+    expect(getSegmentedChoiceTypographyTokens().fontSizes).toEqual({
+      sm: '12px',
+      md: '14px',
+      lg: '16px',
+    });
+    expect(getSegmentedChoiceColorTokens()).toBe(SEGMENTED_CHOICE_COLOR_TOKENS);
+    expect(getSegmentedChoiceColorTokens()).toMatchObject({
+      accent: '#E6E8EC',
+      surface: '#F5F7FA',
+      text: '#1A1D23',
+    });
+    expect(getSegmentedChoiceSizeTokens('sm')).toBe(SEGMENTED_CHOICE_SIZE_TOKENS.sm);
+    expect(getSegmentedChoiceSizeTokens('md')).toMatchObject({
+      containerOffset: '4px',
+      fontSize: '14px',
+      optionRadius: '7px',
+    });
+    expect(getSegmentedChoiceSizeTokens('lg')).toMatchObject({
+      containerOffset: '6px',
+      fontSize: '16px',
+      optionMinSize: '40px',
+    });
+  });
+
+  it('validates option values and readable labels through the shared validation helpers', () => {
+    const options = [
+      { value: 'day', label: 'Day', disabled: true },
+      { value: 'week', label: <span>Week</span> },
+      { value: 'month', label: <span aria-hidden /> },
+      { value: 'year', label: <span aria-hidden />, ariaLabel: 'Year' },
+    ] as const;
+
+    expect(stringifyValue(Symbol.for('range'))).toBe('Symbol(range)');
+    expect(hasReadableTextLabel('  ')).toBe(false);
+    expect(hasReadableTextLabel(42)).toBe(true);
+    expect(hasReadableTextLabel([null, <span key="label">Readable</span>])).toBe(true);
+    expect(hasReadableTextLabel(<span aria-hidden />)).toBe(false);
+    expect(getFirstEnabledValue(options)).toBe('week');
+    expect(isSelectableValue(options, undefined)).toBe(false);
+    expect(isSelectableValue(options, 'day')).toBe(false);
+    expect(isSelectableValue(options, 'week')).toBe(true);
+    expect(getNonTextOptionsMissingAriaLabel(options)).toEqual(['month']);
+    expect(validateOptionsStructure(options)).toEqual({
+      valid: true,
+      firstEnabledValue: 'week',
+    });
+    expect(
+      validateOptionsStructure([
+        { value: 'day', label: 'Day' },
+        { value: 'day', label: 'Duplicate day' },
+        { value: 1, label: 'Invalid' },
+      ] as unknown as typeof options)
+    ).toEqual({
+      valid: false,
+      duplicateValues: ['day'],
+      invalidValueIndexes: [2],
+      optionCount: 3,
+    });
+  });
+
+  it('deduplicates development warnings and suppresses them in production', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const previousNodeEnv = process.env.NODE_ENV;
+
+    try {
+      __resetSegmentedChoiceWarnings();
+      warnInvalidDefaultValue('missing');
+      warnInvalidDefaultValue('missing');
+      warnMissingAriaLabel('icon');
+
+      expect(warn).toHaveBeenCalledTimes(2);
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('defaultValue "missing"'));
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('Option "icon"'));
+
+      __resetSegmentedChoiceWarnings();
+      process.env.NODE_ENV = 'production';
+      warnInvalidDefaultValue('production-missing');
+
+      expect(warn).toHaveBeenCalledTimes(2);
+    } finally {
+      if (previousNodeEnv === undefined) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = previousNodeEnv;
+      }
+      __resetSegmentedChoiceWarnings();
+    }
+  });
+
   it('keeps controlled state stable until the parent updates', () => {
     const onValueChange = vi.fn();
 
@@ -343,6 +457,20 @@ export function registerSegmentedChoiceStateContractSuite() {
     );
     expect(segmentedChoiceCss)
       .toContain(`.rsc-root[data-rsc-indicator-transition='instant'] .rsc-indicator {
+  transition:
+    opacity 120ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    border-width 160ms ease;
+}`);
+  });
+
+  it('contains the initial indicator placement transition override in CSS', () => {
+    expect(segmentedChoiceCss).toContain(
+      ".rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator"
+    );
+    expect(segmentedChoiceCss)
+      .toContain(`.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator {
   transition:
     opacity 120ms ease,
     background-color 160ms ease,

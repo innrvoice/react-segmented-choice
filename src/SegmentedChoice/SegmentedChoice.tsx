@@ -1,4 +1,12 @@
-import React, { forwardRef, useEffect, useId, useLayoutEffect, useMemo, useRef } from 'react';
+import React, {
+  forwardRef,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { SegmentedChoiceOptionRow } from './components/SegmentedChoiceOption';
 import { SegmentedChoiceOptionText } from './components/SegmentedChoiceOptionText';
@@ -322,6 +330,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     sizeAdjustment: indicatorSizeAdjustment,
     useRenderedIndicatorSize,
   });
+  const [indicatorMotionState, setIndicatorMotionState] = useState<'initial' | 'ready'>('initial');
   const trackLayout = useTrackLayout({
     listRef,
     measureRefs: anchorRefs,
@@ -364,6 +373,31 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     anchorRefs.current.length = options.length;
     inputRefs.current.length = options.length;
   }, [inputRefs, options.length]);
+
+  useEffect(() => {
+    if (
+      indicatorMotionState !== 'initial' ||
+      !indicatorLayout.isVisible ||
+      indicatorLayout.width <= 0 ||
+      indicatorLayout.height <= 0 ||
+      typeof window === 'undefined'
+    ) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setIndicatorMotionState('ready');
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [
+    indicatorLayout.height,
+    indicatorLayout.isVisible,
+    indicatorLayout.width,
+    indicatorMotionState,
+  ]);
 
   const optionRowRefs = {
     anchorRefs,
@@ -441,6 +475,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
       }
       data-rsc-drag-previewing={dragPreviewing ? 'true' : 'false'}
       data-rsc-indicator-content-mode={resolvedIndicatorContentMode}
+      data-rsc-indicator-motion={indicatorMotionState === 'initial' ? 'initial' : undefined}
       data-rsc-indicator-style={resolvedIndicatorStyle}
       data-rsc-indicator-transition={resolvedIndicatorTransition}
       data-rsc-instance={instanceId}
