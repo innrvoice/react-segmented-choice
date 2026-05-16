@@ -2840,6 +2840,51 @@ export function registerSegmentedChoiceBehaviorSuite() {
     });
   });
 
+  it('keeps initial motion suppressed while fixed option geometry settles', async () => {
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Dock"
+        geometry={{
+          mode: 'overlay',
+          optionSize: 88,
+          indicator: { content: 'clone-active', style: 'fill' },
+        }}
+        optionSizing="content"
+        options={baseOptions}
+        value="week"
+      />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+
+    setElementRect(list, { left: 0, top: 0, width: 320, height: 104 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 57, height: 32 });
+    setElementRect(labels[1] as Element, { left: 84, top: 8, width: 57, height: 32 });
+    setElementRect(labels[2] as Element, { left: 168, top: 0, width: 57, height: 32 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('57px');
+      expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    });
+
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 88, height: 88 });
+    setElementRect(labels[1] as Element, { left: 96, top: 8, width: 88, height: 88 });
+    setElementRect(labels[2] as Element, { left: 192, top: 0, width: 88, height: 88 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('88px');
+      expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    });
+
+    await waitFor(() => {
+      expect(root.dataset.rscIndicatorMotion).toBeUndefined();
+    });
+  });
+
   it('moves the underlay content-width indicator from old geometry to clicked geometry', async () => {
     const options = [
       { value: 'deep', label: 'Deep Focus' },
