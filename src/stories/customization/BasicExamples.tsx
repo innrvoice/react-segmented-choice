@@ -1030,46 +1030,42 @@ export const ModernThumbnail: LooseStory = {
 
 function CameraAutoIcon() {
   return (
-    <svg className="camera-mode-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M6 8h3l1.2-2h3.6L15 8h3a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z"
-      />
-      <circle cx="12" cy="13" r="3.25" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="20px"
+      viewBox="0 -960 960 960"
+      width="20px"
+      fill="currentColor"
+    >
+      <path d="M480-576h296q-22-66-70.5-116.5T592-769L480-576Zm-83 48 148-256q-17-2-33-5t-32-3q-54 0-103.5 18.5T285-723l112 195Zm-225 96h225L249-689q-40 43-60.5 97T168-480q0 13 1 25t3 23Zm196 241 112-193H184q23 66 70 117t114 76Zm112 23q53 0 102.5-18t92.5-51L563-432 415-176q16 2 32 5t33 3Zm231-103q38-43 59.5-96.5T792-480q0-12-1-24t-3-24H563l148 257ZM480-480Zm0 384q-80 0-150-30t-122-82q-52-52-82-122T96-480q0-80 30-149.5t82-122Q260-804 330-834t150-30q80 0 149.5 30t122 82.5Q804-699 834-629.5T864-480q0 80-30 150t-82.5 122q-52.5 52-122 82T480-96Z" />
     </svg>
   );
 }
 
 function CameraPortraitIcon() {
   return (
-    <svg className="camera-mode-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="8" r="3" fill="currentColor" />
-      <path
-        d="M6 18c0-2.8 2.7-5 6-5s6 2.2 6 5"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-      <rect
-        x="4.5"
-        y="4.5"
-        width="15"
-        height="15"
-        rx="5.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="20px"
+      viewBox="0 -960 960 960"
+      width="20px"
+      fill="currentColor"
+    >
+      <path d="M237-285q54-38 115.5-56.5T480-360q66 0 127.5 18.5T723-285q35-41 52-91t17-104q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 54 17 104t52 91Zm141-165q-42-42-42-102t42-102q42-42 102-42t102 42q42 42 42 102t-42 102q-42 42-102 42t-102-42ZM480-96q-79 0-149-30t-122.5-82.5Q156-261 126-331T96-480q0-80 30-149.5t82.5-122Q261-804 331-834t149-30q80 0 149.5 30t122 82.5Q804-699 834-629.5T864-480q0 79-30 149t-82.5 122.5Q699-156 629.5-126T480-96Zm100-88.5q48-16.5 90-48.5-43-27-91-41t-99-14q-51 0-99.5 13.5T290-233q42 32 90 48.5T480-168q52 0 100-16.5ZM531-501q21-21 21-51t-21-51q-21-21-51-21t-51 21q-21 21-21 51t21 51q21 21 51 21t51-21Zm-51-51Zm0 319Z" />
     </svg>
   );
 }
 
 function CameraNightIcon() {
   return (
-    <svg className="camera-mode-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12.5 4.5a7.5 7.5 0 1 0 4 13 8 8 0 1 1-4-13Z" fill="currentColor" />
-      <circle cx="14.6" cy="8.1" r="1.1" fill="currentColor" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="20px"
+      viewBox="0 -960 960 960"
+      width="20px"
+      fill="currentColor"
+    >
+      <path d="M479.96-144Q340-144 242-242t-98-238q0-140 97.93-238t237.83-98q13.06 0 25.65 1 12.59 1 25.59 3-39 29-62 72t-23 92q0 85 58.5 143.5T648-446q49 0 92-23t72-62q2 13 3 25.59t1 25.65q0 139.9-98.04 237.83t-238 97.93Zm.04-72q82 0 148.78-47.07Q695.55-310.15 727-386q-20 5-39.67 8.5Q667.67-374 648-374q-113.86 0-193.93-80.07Q374-534.14 374-648q0-19.67 3.5-39.33Q381-707 386-727q-75.85 31.45-122.93 98.22Q216-562 216-480q0 110 77 187t187 77Zm-14-250Z" />
     </svg>
   );
 }

@@ -31,6 +31,10 @@ Import bundled styles once:
 import 'react-segmented-choice/styles.css';
 ```
 
+Import the bundled stylesheet before your app or component CSS so your
+component-level overrides can naturally customize public `--rsc-*` variables
+and stable `.rsc-*` hooks.
+
 ## Quick Start
 
 ```tsx
