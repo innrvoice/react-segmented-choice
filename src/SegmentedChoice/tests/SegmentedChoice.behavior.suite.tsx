@@ -2782,6 +2782,64 @@ export function registerSegmentedChoiceBehaviorSuite() {
     });
   });
 
+  it('places an uncontrolled non-first defaultValue without initial geometry motion', async () => {
+    const { container } = render(
+      <SegmentedChoice ariaLabel="Range" defaultValue="week" options={baseOptions} />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+
+    expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    expect(root.dataset.rscIndicatorTransition).toBe('smooth');
+
+    setElementRect(list, { left: 0, top: 0, width: 320, height: 48 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 72, height: 48 });
+    setElementRect(labels[1] as Element, { left: 84, top: 0, width: 116, height: 48 });
+    setElementRect(labels[2] as Element, { left: 212, top: 0, width: 96, height: 48 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('114px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('85px');
+      expect(root.dataset.rscIndicatorMotion).toBeUndefined();
+    });
+
+    fireEvent.click(getRadio('Month'));
+
+    await waitFor(() => {
+      expect(root.dataset.rscIndicatorMotion).toBeUndefined();
+      expect(root.dataset.rscIndicatorTransition).toBe('smooth');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('213px');
+    });
+  });
+
+  it('places a controlled non-first initial value without initial geometry motion', async () => {
+    const { container } = render(
+      <SegmentedChoice ariaLabel="Range" options={baseOptions} value="month" />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+
+    expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    expect(root.dataset.rscIndicatorTransition).toBe('smooth');
+
+    setElementRect(list, { left: 0, top: 0, width: 320, height: 48 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 72, height: 48 });
+    setElementRect(labels[1] as Element, { left: 84, top: 0, width: 116, height: 48 });
+    setElementRect(labels[2] as Element, { left: 212, top: 0, width: 96, height: 48 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('94px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('213px');
+      expect(root.dataset.rscIndicatorMotion).toBeUndefined();
+    });
+  });
+
   it('moves the underlay content-width indicator from old geometry to clicked geometry', async () => {
     const options = [
       { value: 'deep', label: 'Deep Focus' },

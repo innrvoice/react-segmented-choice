@@ -202,6 +202,14 @@
     border-width 160ms ease;
 }
 
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator {
+  transition:
+    opacity 120ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    border-width 160ms ease;
+}
+
 .rsc-root[data-rsc-indicator-style='fill'] .rsc-indicator {
   background: var(--_rsc-indicator-color, var(--rsc-indicator-color));
   box-shadow: var(--rsc-indicator-shadow);
