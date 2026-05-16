@@ -479,6 +479,10 @@ Don't:
 
 These are public `--rsc-*` tokens intended for external CSS overrides.
 
+Import `react-segmented-choice/styles.css` before your app or component CSS so
+your overrides can naturally customize these variables and stable `.rsc-*`
+hooks.
+
 ### Surface and color
 
 | Variable                  | What it controls                                         |
