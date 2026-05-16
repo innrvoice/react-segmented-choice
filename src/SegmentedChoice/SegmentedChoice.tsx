@@ -28,7 +28,11 @@ import {
   stringifyValue,
   validateOptionsStructure,
 } from './internal/validation';
-import type { SegmentedChoiceProps, SegmentedChoiceValue } from './SegmentedChoice.types';
+import type {
+  SegmentedChoiceOptionSizing,
+  SegmentedChoiceProps,
+  SegmentedChoiceValue,
+} from './SegmentedChoice.types';
 import {
   warnDuplicateValues,
   warnInvalidControlledValue,
@@ -63,20 +67,20 @@ function setForwardedRef<T>(ref: React.ForwardedRef<T>, value: T) {
 
 function resolveIndicatorInsetPx({
   indicatorInset,
-  resolvedTrackStyle,
   selectionMode,
+  trackStyle,
   unstyled,
 }: {
   indicatorInset: number | undefined;
-  resolvedTrackStyle: string;
   selectionMode: string;
+  trackStyle: string;
   unstyled: boolean;
 }) {
   if (indicatorInset !== undefined) {
     return indicatorInset;
   }
 
-  if (!unstyled && selectionMode === 'underlay' && resolvedTrackStyle === 'surface') {
+  if (!unstyled && selectionMode === 'underlay' && trackStyle === 'surface') {
     return 1;
   }
 
@@ -87,25 +91,29 @@ function resolveShouldRenderAnchor({
   anchorHeight,
   anchorWidth,
   hasExplicitAnchorSlot,
-  resolvedIndicatorStyle,
-  resolvedTrackLayout,
+  indicatorStyle,
   selectionMode,
+  trackLayout,
 }: {
   anchorHeight: number | undefined;
   anchorWidth: number | undefined;
   hasExplicitAnchorSlot: boolean;
-  resolvedIndicatorStyle: string;
-  resolvedTrackLayout: string;
+  indicatorStyle: string;
   selectionMode: string;
+  trackLayout: string;
 }) {
   return (
     hasExplicitAnchorSlot ||
     anchorWidth !== undefined ||
     anchorHeight !== undefined ||
     selectionMode === 'overlay' ||
-    resolvedTrackLayout === 'center-span' ||
-    resolvedIndicatorStyle === 'ring'
+    trackLayout === 'center-span' ||
+    indicatorStyle === 'ring'
   );
+}
+
+function isNearLayoutSize(measured: number, expected: number) {
+  return Math.abs(measured - expected) < 0.5;
 }
 
 function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
@@ -203,21 +211,31 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   const resolvedGeometry = useMemo(() => resolveGeometryConfig(geometry), [geometry]);
   const normalizedSlotProps = useMemo(() => normalizeSlotProps(slotProps), [slotProps]);
   const selectionMode = resolvedGeometry.mode;
-  const resolvedTrackLayout = resolvedGeometry.trackLayout;
-  const resolvedTrackStyle = resolvedGeometry.trackStyle;
-  const resolvedIndicatorStyle = resolvedGeometry.indicatorStyle;
-  const resolvedIndicatorContentMode = resolvedGeometry.indicatorContentMode;
-  const resolvedIndicatorTransition = resolvedGeometry.indicatorTransition;
-  const anchorWidth = resolvedGeometry.anchorWidth;
-  const anchorHeight = resolvedGeometry.anchorHeight;
+  const trackConfig = {
+    layout: resolvedGeometry.trackLayout,
+    style: resolvedGeometry.trackStyle,
+  };
+  const anchorConfig = {
+    width: resolvedGeometry.anchorWidth,
+    height: resolvedGeometry.anchorHeight,
+  };
+  const indicatorConfig = {
+    borderWidth: resolvedGeometry.indicatorBorderWidth,
+    contentMode: resolvedGeometry.indicatorContentMode,
+    height: resolvedGeometry.indicatorHeight,
+    inset: resolvedGeometry.indicatorInset,
+    style: resolvedGeometry.indicatorStyle,
+    transition: resolvedGeometry.indicatorTransition,
+    width: resolvedGeometry.indicatorWidth,
+  };
+  const optionLayoutSizing: SegmentedChoiceOptionSizing | 'fixed' =
+    resolvedGeometry.optionSize !== undefined ? 'fixed' : optionSizing;
+  const optionLayoutConfig = {
+    distribution: optionDistribution,
+    size: resolvedGeometry.optionSize,
+    sizing: optionLayoutSizing,
+  };
   const dragScale = resolvedGeometry.dragScale ?? false;
-  const indicatorBorderWidth = resolvedGeometry.indicatorBorderWidth;
-  const indicatorInset = resolvedGeometry.indicatorInset;
-  const optionSize = resolvedGeometry.optionSize;
-  const resolvedOptionSizing = optionSize !== undefined ? 'fixed' : optionSizing;
-  const resolvedOptionDistribution = optionDistribution;
-  const indicatorWidth = resolvedGeometry.indicatorWidth;
-  const indicatorHeight = resolvedGeometry.indicatorHeight;
 
   // Current selection state, including uncontrolled fallback behavior.
   const { currentValue, commitValue, isControlled, resetValue } = useControllableValue({
@@ -244,28 +262,35 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   const anchorRefs = useRef<Array<HTMLSpanElement | null>>([]);
 
   // Layout flags keep the later hooks/render logic readable without changing behavior.
-  const indicatorBorderWidthPx = indicatorBorderWidth ?? 0;
+  const indicatorBorderWidthPx = indicatorConfig.borderWidth ?? 0;
   const indicatorInsetPx = resolveIndicatorInsetPx({
-    indicatorInset,
-    resolvedTrackStyle,
+    indicatorInset: indicatorConfig.inset,
     selectionMode,
+    trackStyle: trackConfig.style,
     unstyled,
   });
   const indicatorSizeAdjustment =
-    indicatorInsetPx * 2 + (resolvedIndicatorStyle === 'ring' ? indicatorBorderWidthPx * 2 : 0);
-  const hasSelectionWidth = indicatorWidth !== undefined;
-  const hasSelectionHeight = indicatorHeight !== undefined;
-  const hasSelectionSize = hasSelectionWidth || hasSelectionHeight;
-  const centerToOption = selectionMode === 'overlay' || hasSelectionSize;
-  const useRenderedIndicatorSize = hasSelectionSize;
+    indicatorInsetPx * 2 + (indicatorConfig.style === 'ring' ? indicatorBorderWidthPx * 2 : 0);
+  const hasExplicitIndicatorWidth = indicatorConfig.width !== undefined;
+  const hasExplicitIndicatorHeight = indicatorConfig.height !== undefined;
+  const hasExplicitIndicatorSize = hasExplicitIndicatorWidth || hasExplicitIndicatorHeight;
+  const indicatorCentersOnOption = selectionMode === 'overlay' || hasExplicitIndicatorSize;
   const shouldRenderAnchor = resolveShouldRenderAnchor({
-    anchorHeight,
-    anchorWidth,
+    anchorHeight: anchorConfig.height,
+    anchorWidth: anchorConfig.width,
     hasExplicitAnchorSlot: slotProps?.optionAnchor !== undefined,
-    resolvedIndicatorStyle,
-    resolvedTrackLayout,
+    indicatorStyle: indicatorConfig.style,
     selectionMode,
+    trackLayout: trackConfig.layout,
   });
+  const expectedFixedIndicatorSize =
+    optionLayoutConfig.size !== undefined && !hasExplicitIndicatorSize
+      ? Math.max(
+          optionLayoutConfig.size +
+            (indicatorCentersOnOption ? indicatorSizeAdjustment : -indicatorInsetPx * 2),
+          0
+        )
+      : undefined;
 
   const {
     commitIndex,
@@ -298,11 +323,11 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     handlePointerMove,
     handlePointerUp,
   } = useDragSelection({
-    centerToOption,
+    centerToOption: indicatorCentersOnOption,
     disabled,
     draggable,
     indicatorRef,
-    inset: centerToOption ? 0 : indicatorInsetPx,
+    inset: indicatorCentersOnOption ? 0 : indicatorInsetPx,
     listRef,
     measureRefs: anchorRefs,
     onCommitIndex: commitIndex,
@@ -312,23 +337,23 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     selectionMode,
     selectedIndex,
     sizeAdjustment: indicatorSizeAdjustment,
-    useRenderedIndicatorSize,
+    useRenderedIndicatorSize: hasExplicitIndicatorSize,
   });
 
   const activeIndex =
     selectionMode === 'underlay' ? (previewIndex ?? committedIndex) : committedIndex;
   const indicatorLayout = useIndicatorLayout({
     activeIndex,
-    centerToOption,
+    centerToOption: indicatorCentersOnOption,
     indicatorRef,
-    inset: centerToOption ? 0 : indicatorInsetPx,
+    inset: indicatorCentersOnOption ? 0 : indicatorInsetPx,
     listRef,
     measureRefs: anchorRefs,
     optionCount: options.length,
     optionRefs,
     overrideLayout: dragLayout,
     sizeAdjustment: indicatorSizeAdjustment,
-    useRenderedIndicatorSize,
+    useRenderedIndicatorSize: hasExplicitIndicatorSize,
   });
   const [indicatorMotionState, setIndicatorMotionState] = useState<'initial' | 'ready'>('initial');
   const trackLayout = useTrackLayout({
@@ -338,10 +363,10 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     optionRefs,
     options,
     orientation,
-    trackLayout: resolvedTrackLayout,
+    trackLayout: trackConfig.layout,
   });
   const equalDistributionLayout = useEqualDistributionLayout({
-    optionSizing: resolvedOptionSizing,
+    optionSizing: optionLayoutConfig.sizing,
     optionContentRefs,
     optionCount: options.length,
   });
@@ -354,7 +379,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   const indicatorScale = dragging ? dragScaleValue : 1;
   const shouldCloneIndicatorContent =
     selectionMode === 'overlay' &&
-    resolvedIndicatorContentMode === 'clone-active' &&
+    indicatorConfig.contentMode === 'clone-active' &&
     indicatorOption !== undefined;
   const interactiveCursor = disabled
     ? undefined
@@ -375,27 +400,46 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   }, [inputRefs, options.length]);
 
   useEffect(() => {
+    const hasMeasuredIndicatorLayout =
+      indicatorLayout.isVisible && indicatorLayout.width > 0 && indicatorLayout.height > 0;
+    const hasSettledFixedIndicatorSize =
+      expectedFixedIndicatorSize === undefined ||
+      (isNearLayoutSize(indicatorLayout.width, expectedFixedIndicatorSize) &&
+        isNearLayoutSize(indicatorLayout.height, expectedFixedIndicatorSize));
+
     if (
       indicatorMotionState !== 'initial' ||
-      !indicatorLayout.isVisible ||
-      indicatorLayout.width <= 0 ||
-      indicatorLayout.height <= 0 ||
+      !hasMeasuredIndicatorLayout ||
+      !hasSettledFixedIndicatorSize ||
       typeof window === 'undefined'
     ) {
       return;
     }
 
-    const frame = window.requestAnimationFrame(() => {
-      setIndicatorMotionState('ready');
-    });
+    let frame = 0;
+    const releaseAfterPaint = (remainingFrames: number) => {
+      frame = window.requestAnimationFrame(() => {
+        if (remainingFrames <= 1) {
+          setIndicatorMotionState('ready');
+          return;
+        }
+
+        releaseAfterPaint(remainingFrames - 1);
+      });
+    };
+
+    releaseAfterPaint(2);
 
     return () => {
       window.cancelAnimationFrame(frame);
     };
   }, [
+    expectedFixedIndicatorSize,
     indicatorLayout.height,
     indicatorLayout.isVisible,
     indicatorLayout.width,
+    indicatorLayout.x,
+    indicatorLayout.y,
     indicatorMotionState,
   ]);
 
@@ -423,22 +467,22 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   };
 
   const instanceStyleText = buildSegmentedChoiceRuntimeRule({
-    anchorHeight,
-    anchorWidth,
+    anchorHeight: anchorConfig.height,
+    anchorWidth: anchorConfig.width,
     equalDistributionLayout,
-    indicatorBorderWidth,
+    indicatorBorderWidth: indicatorConfig.borderWidth,
     indicatorColor: indicatorOption?.accentColor,
     indicatorCursor,
-    indicatorHeight: hasSelectionHeight ? indicatorHeight : undefined,
+    indicatorHeight: hasExplicitIndicatorHeight ? indicatorConfig.height : undefined,
     indicatorLayout,
     indicatorScale,
-    indicatorWidth: hasSelectionWidth ? indicatorWidth : undefined,
+    indicatorWidth: hasExplicitIndicatorWidth ? indicatorConfig.width : undefined,
     instanceId,
     listCursor,
     listTouchAction,
-    optionSize,
-    resolvedOptionSizing,
-    resolvedTrackLayout,
+    optionSize: optionLayoutConfig.size,
+    resolvedOptionSizing: optionLayoutConfig.sizing,
+    resolvedTrackLayout: trackConfig.layout,
     trackLayout,
   });
 
@@ -471,19 +515,19 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
       data-dragging={dragging ? 'true' : 'false'}
       data-orientation={orientation}
       data-rsc-anchor-sizing={
-        anchorWidth !== undefined || anchorHeight !== undefined ? 'explicit' : 'fill'
+        anchorConfig.width !== undefined || anchorConfig.height !== undefined ? 'explicit' : 'fill'
       }
       data-rsc-drag-previewing={dragPreviewing ? 'true' : 'false'}
-      data-rsc-indicator-content-mode={resolvedIndicatorContentMode}
+      data-rsc-indicator-content-mode={indicatorConfig.contentMode}
       data-rsc-indicator-motion={indicatorMotionState === 'initial' ? 'initial' : undefined}
-      data-rsc-indicator-style={resolvedIndicatorStyle}
-      data-rsc-indicator-transition={resolvedIndicatorTransition}
+      data-rsc-indicator-style={indicatorConfig.style}
+      data-rsc-indicator-transition={indicatorConfig.transition}
       data-rsc-instance={instanceId}
-      data-rsc-option-distribution={resolvedOptionDistribution}
-      data-rsc-option-sizing={resolvedOptionSizing}
+      data-rsc-option-distribution={optionLayoutConfig.distribution}
+      data-rsc-option-sizing={optionLayoutConfig.sizing}
       data-rsc-selection-mode={selectionMode}
-      data-rsc-track-layout={resolvedTrackLayout}
-      data-rsc-track-style={resolvedTrackStyle}
+      data-rsc-track-layout={trackConfig.layout}
+      data-rsc-track-style={trackConfig.style}
       data-size={size}
       data-unstyled={unstyled ? 'true' : 'false'}
     >

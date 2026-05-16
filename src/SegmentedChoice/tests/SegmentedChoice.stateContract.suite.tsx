@@ -466,17 +466,57 @@ export function registerSegmentedChoiceStateContractSuite() {
   });
 
   it('contains the initial indicator placement transition override in CSS', () => {
-    expect(segmentedChoiceCss).toContain(
-      ".rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator"
-    );
     expect(segmentedChoiceCss)
-      .toContain(`.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator {
-  transition:
-    opacity 120ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    border-width 160ms ease;
+      .toContain(`.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator::before,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator::after,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator-content,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator-content * {
+  animation: none !important;
+  transition: none !important;
 }`);
+  });
+
+  it('keeps initial indicator suppression stronger than custom indicator transitions', () => {
+    const { container } = render(
+      <>
+        <style>{segmentedChoiceCss}</style>
+        <style>{`
+          .custom-startup.rsc-root .rsc-indicator {
+            animation: custom-startup 1s ease;
+            transition: transform 10s ease, width 10s ease, height 10s ease;
+          }
+
+          .custom-startup.rsc-root .rsc-indicator-content > * {
+            animation: custom-startup-content 1s ease;
+            transition: transform 10s ease;
+          }
+        `}</style>
+        <SegmentedChoice
+          ariaLabel="Startup transition"
+          className="custom-startup"
+          geometry={{
+            mode: 'overlay',
+            indicator: { content: 'clone-active', style: 'fill' },
+          }}
+          options={baseOptions}
+          value="week"
+        />
+      </>
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const indicator = container.querySelector('.rsc-indicator') as HTMLSpanElement;
+    const clonedLabel = container.querySelector(
+      '.rsc-indicator-content .rsc-option-label'
+    ) as HTMLSpanElement;
+
+    expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    expect(root.dataset.rscIndicatorTransition).toBe('smooth');
+    expect(window.getComputedStyle(indicator).animationName).toBe('none');
+    expect(window.getComputedStyle(indicator).transitionDuration).toBe('0s');
+    expect(window.getComputedStyle(clonedLabel).animationName).toBe('none');
+    expect(window.getComputedStyle(clonedLabel).transitionDuration).toBe('0s');
   });
 
   it('exposes the stable root and option data attributes', () => {

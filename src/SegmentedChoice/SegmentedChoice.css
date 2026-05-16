@@ -202,12 +202,13 @@
     border-width 160ms ease;
 }
 
-.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator {
-  transition:
-    opacity 120ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    border-width 160ms ease;
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator::before,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator::after,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator-content,
+.rsc-root[data-rsc-indicator-motion='initial'] .rsc-indicator-content * {
+  animation: none !important;
+  transition: none !important;
 }
 
 .rsc-root[data-rsc-indicator-style='fill'] .rsc-indicator {
