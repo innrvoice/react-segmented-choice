@@ -271,9 +271,8 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   });
   const indicatorSizeAdjustment =
     indicatorInsetPx * 2 + (indicatorConfig.style === 'ring' ? indicatorBorderWidthPx * 2 : 0);
-  const hasExplicitIndicatorWidth = indicatorConfig.width !== undefined;
-  const hasExplicitIndicatorHeight = indicatorConfig.height !== undefined;
-  const hasExplicitIndicatorSize = hasExplicitIndicatorWidth || hasExplicitIndicatorHeight;
+  const hasExplicitIndicatorSize =
+    indicatorConfig.width !== undefined || indicatorConfig.height !== undefined;
   const indicatorCentersOnOption = selectionMode === 'overlay' || hasExplicitIndicatorSize;
   const shouldRenderAnchor = resolveShouldRenderAnchor({
     anchorHeight: anchorConfig.height,
@@ -388,8 +387,6 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
       : draggable
         ? 'grab'
         : 'pointer';
-  const indicatorCursor = interactiveCursor;
-  const listCursor = interactiveCursor;
   const listTouchAction = !disabled && draggable ? 'none' : undefined;
 
   useLayoutEffect(() => {
@@ -472,13 +469,13 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     equalDistributionLayout,
     indicatorBorderWidth: indicatorConfig.borderWidth,
     indicatorColor: indicatorOption?.accentColor,
-    indicatorCursor,
-    indicatorHeight: hasExplicitIndicatorHeight ? indicatorConfig.height : undefined,
+    indicatorCursor: interactiveCursor,
+    indicatorHeight: indicatorConfig.height !== undefined ? indicatorConfig.height : undefined,
     indicatorLayout,
     indicatorScale,
-    indicatorWidth: hasExplicitIndicatorWidth ? indicatorConfig.width : undefined,
+    indicatorWidth: indicatorConfig.width !== undefined ? indicatorConfig.width : undefined,
     instanceId,
-    listCursor,
+    listCursor: interactiveCursor,
     listTouchAction,
     optionSize: optionLayoutConfig.size,
     resolvedOptionSizing: optionLayoutConfig.sizing,
