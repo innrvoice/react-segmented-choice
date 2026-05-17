@@ -3,17 +3,17 @@
 [![codecov](https://codecov.io/gh/innrvoice/react-segmented-choice/branch/main/graph/badge.svg)](https://codecov.io/gh/innrvoice/react-segmented-choice)
 [![bundle size](https://codecov.io/github/innrvoice/react-segmented-choice/branch/main/graph/bundle/react-segmented-choice-esm/badge.svg)](https://app.codecov.io/github/innrvoice/react-segmented-choice/bundles/main/react-segmented-choice-esm)
 
-`react-segmented-choice` is an accessible segmented control for immediate single-choice selection in React.
+`react-segmented-choice` is a React segmented control for choices that should feel like real UI, not styled tabs.
 
-It is built for controls that should feel like real form inputs, not just clickable tabs: native radio semantics, keyboard behavior, drag-to-select, CSS-first theming and geometry hooks for custom indicator layouts.
+It keeps the boring parts in place: native radio semantics, keyboard behavior, form-friendly state and drag-to-select. From there, you can shape the same component into a switch, toolbar, option picker, rail or compact mode control with CSS and measured geometry.
 
 Typical use cases:
 
 - report ranges, billing periods, density switches and mode pickers
-- icon controls where every option should keep a stable target
-- custom segmented controls that still need form and accessibility behavior
+- icon rails and compact toolbars where every option needs a stable target
+- custom switches or tabs alternatives that should still behave like form controls
 
-Browse practical customization examples and architecture stories in the hosted [Storybook](https://sb.segmentedchoice.visiofutura.com/).
+The hosted [Storybook](https://sb.segmentedchoice.visiofutura.com/) shows the range: plain controls, rails, thumbnails, filters, toggles and the geometry stories behind them.
 
 ## Install
 
@@ -31,9 +31,7 @@ Import bundled styles once:
 import 'react-segmented-choice/styles.css';
 ```
 
-Import the bundled stylesheet before your app or component CSS so your
-component-level overrides can naturally customize public `--rsc-*` variables
-and stable `.rsc-*` hooks.
+Import the bundled stylesheet before your app or component CSS. That keeps the default skin available while letting your own classes override public `--rsc-*` variables and stable `.rsc-*` hooks in normal CSS order.
 
 ## Quick Start
 
@@ -58,7 +56,7 @@ export function ReportRange() {
 
 ## Value Type (`string` only)
 
-`SegmentedChoiceValue` is `string`. Option values are the public selection contract, so use stable IDs even when the selected domain object is richer than a string.
+`SegmentedChoiceValue` is `string`. Treat option values as stable public IDs. If the selected thing is a richer object, keep that object in your app state and pass the ID to the control.
 
 For complex domain values, keep external mapping by ID:
 
@@ -83,7 +81,7 @@ const byId = Object.fromEntries(items.map(x => [x.id, x.plan]));
 
 ## Public API
 
-The component has one main entry point and a small set of supporting types. The README keeps the surface map short; `API.md` has the prop-by-prop reference and longer customization examples.
+The package has one component entry point and a small type surface. This README keeps the map short; `API.md` is where the prop-by-prop reference and longer examples live.
 
 Exports:
 
@@ -125,7 +123,7 @@ Option fields:
 
 ### `geometry`
 
-Use `geometry` for mechanics and measured layout: underlay vs overlay, track span, explicit option/anchor/indicator sizing, drag scale, indicator paint mode, cloned indicator content and indicator transition behavior.
+Use `geometry` when the layout mechanics need to change, not just the colors. It controls things like underlay vs overlay behavior, track span, fixed option or indicator sizes, drag scale, cloned indicator content and indicator motion.
 
 ```ts
 geometry?: {
@@ -163,16 +161,16 @@ Defaults:
 - `geometry.indicator.content = "none"`
 - `geometry.indicator.transition = "smooth"`
 
-`geometry.indicator.transition` controls selection indicator geometry motion:
+`geometry.indicator.transition` is only about the moving selection indicator:
 
 - `"smooth"` animates selection indicator position and size changes.
-- `"instant"` updates selection indicator geometry without movement or resize animation.
+- `"instant"` updates indicator position and size without movement or resize animation.
 
-This affects the selection indicator only. It does not delay value changes or alter drag preview behavior.
+It does not delay value changes or change drag preview behavior.
 
 ### `slotProps`
 
-`slotProps` is for external attrs/events/class hooks only:
+`slotProps` is for integration hooks, not visual styling:
 
 - allowed: `className`, `data-*`, non-conflicting `aria-*`, handlers (`onPointerEnter`, etc.)
 - not supported: `style`
@@ -180,7 +178,7 @@ This affects the selection indicator only. It does not delay value changes or al
 `style` is intentionally ignored at runtime even if forced through a cast.
 
 For `slotProps.list`, internal pointer/focus handlers run before user-provided handlers.
-Use list-level handlers to observe or augment interactions, not to override the built-in drag/commit flow.
+Use list-level handlers to observe or add to interactions. Do not rely on them to override the built-in drag and commit flow.
 
 Root radiogroup semantics stay controlled by top-level props such as `ariaLabel`, `ariaLabelledby` and `ariaDescribedby`.
 
@@ -203,16 +201,16 @@ Example:
 
 ## CSS-First Customization Contract
 
-`SegmentedChoice` does not write `style={...}` onto its rendered slots.
+`SegmentedChoice` does not put `style={...}` on its rendered slots.
 
-The public styling surface is intentionally CSS-first:
+The styling contract is intentionally CSS-first:
 
 - stable `.rsc-*` classes for slot targeting
 - core state `data-*` attrs for state-specific styling
 - public `--rsc-*` variables for theme tokens
-- no rendered slot inline styles, so external CSS can still override variables such as `--rsc-surface`
+- no rendered slot inline styles, so your CSS can still override variables such as `--rsc-surface`
 
-Runtime geometry is different from theme styling. Measured layout values are written through an internal scoped stylesheet, not through element inline styles.
+Runtime geometry is separate from theme styling. Measured positions and sizes are written through an internal scoped stylesheet, not through slot inline styles.
 
 ### CSP-safe runtime styles
 
@@ -267,7 +265,7 @@ Optional public override:
 
 Public variables are the documented `--rsc-*` tokens above. They are safe to theme from external CSS.
 
-Internal runtime selectors and variables use `data-rsc-*` and `--_rsc-*`. They are implementation details used by the bundled stylesheet and scoped runtime layout rules, not supported customization API.
+Internal runtime selectors and variables use `data-rsc-*` and `--_rsc-*`. They belong to the bundled stylesheet and scoped runtime layout rules. Do not build app-level styling contracts on them.
 
 ### SSR and Hydration
 
@@ -275,7 +273,7 @@ Server rendering does not emit the internal runtime stylesheet.
 
 - SSR markup is safe to render without touching `window`, `document` or `navigator`
 - the scoped runtime CSS is installed on the client after hydration during the first layout effect
-- plan for the indicator and measured geometry to settle on the client after hydration
+- expect indicator geometry to settle on the client after hydration
 
 ## API Precedence
 
@@ -285,26 +283,26 @@ Server rendering does not emit the internal runtime stylesheet.
 4. Class/data selectors define contextual styling.
 5. `slotProps` adds attrs/events/class names to slots.
 
-Use `geometry` for behavior/geometry, CSS for appearance.
+Use `geometry` when the component should measure or move differently. Use CSS when the same mechanics should look different.
 
-`unstyled` means "remove the default visual skin", not "headless DOM primitive". Structure, semantics, slots and layout logic still come from the component.
+`unstyled` means "remove the default visual skin". It is not a headless primitive. Structure, semantics, slots and layout logic still come from the component.
 
 For deeper guidance, examples and sentence-level descriptions of each stable class/data hook, read `API.md`.
 
 ## Storybook
 
-The hosted Storybook contains practical customization patterns, architecture stories, interaction demos and real-world segmented control examples.
+Storybook is the easiest place to see the component pushed past the default pill control.
 
 It covers:
 
 - baseline variants and state examples
 - geometry and indicator architecture
 - CSS-first customization patterns
-- rails, thumbnails, filters and toggle-like controls
+- rails, thumbnails, filters, custom switches and toggle-like controls
 - keyboard, pointer, drag and accessibility interaction behavior
 - styling examples built only on the documented public API
 
-Run Storybook locally with `pnpm storybook` or browse and examine the hosted examples at [sb.segmentedchoice.visiofutura.com](https://sb.segmentedchoice.visiofutura.com/).
+Run it locally with `pnpm storybook`, or browse the hosted examples at [sb.segmentedchoice.visiofutura.com](https://sb.segmentedchoice.visiofutura.com/).
 
 ## Browser Support
 
@@ -322,7 +320,7 @@ pnpm test:visual
 pnpm test:visual:update
 ```
 
-`test:visual` builds Storybook and runs screenshot diffs against the curated `tags: ["visual"]` stories.
+`test:visual` builds Storybook and compares screenshots for the curated `tags: ["visual"]` stories.
 
 ## Accessibility
 
@@ -336,7 +334,7 @@ pnpm test:visual:update
 
 Tagged releases publish a CycloneDX SBOM generated from the pnpm lockfile.
 
-The SBOM can be used by security and compliance tooling to inspect dependency metadata.
+Security and compliance tooling can use the SBOM to inspect dependency metadata.
 
 ## Quality Gates
 
@@ -351,7 +349,7 @@ The SBOM can be used by security and compliance tooling to inspect dependency me
 - Visual regression: `pnpm test:visual`
 - Coverage: `pnpm test:coverage`
 
-CI runs formatting, lint, unit coverage, package build, public contract checks, package-content checks, Storybook browser tests and Chromium/WebKit visual regression.
+CI runs format checks, lint, unit coverage, package build, public contract checks, package-content checks, Storybook browser tests and Chromium/WebKit visual regression.
 
 `prepack` runs: build -> contract check -> pack check.
 

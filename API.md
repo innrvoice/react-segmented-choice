@@ -1,8 +1,8 @@
 # SegmentedChoice API Reference
 
-The README gets you to a working control. This file is for the parts that are easier to understand once the quick start is out of the way: value ownership, geometry, slot hooks, CSS customization and the few sharp edges that matter in real apps.
+The README gets you to a working control. This file is for the parts that matter once you start fitting it into a real interface: value ownership, geometry, slot hooks, CSS customization and the few sharp edges worth knowing.
 
-If you only need the default segmented control, the README is probably enough. If you are changing layout mechanics, wiring analytics attrs, building a custom skin or using the component in forms, this reference should answer the "what owns this?" questions.
+If you only need the default segmented control, the README is probably enough. If you are changing layout mechanics, wiring analytics attrs, building a custom skin or using the component in forms, this reference is meant to answer the "what owns this?" questions.
 
 ## Component Signature
 
@@ -51,12 +51,12 @@ type SegmentedChoiceOption<T extends string = string> = {
 
 Field details:
 
-- `value`: unique string identifier used in selection state.
+- `value`: unique string identifier used for selection state.
 - `label`: rendered content for the option.
 - `ariaLabel`: strongly recommended for icon-only labels.
-- `description`: secondary content under/alongside label depending on styles.
+- `description`: secondary content beside or under the label, depending on styles.
 - `disabled`: disables only this option.
-- `accentColor`: optional per-option accent used by indicator color logic.
+- `accentColor`: optional per-option accent used by the indicator color logic.
   Supported formats are hex, alphabetic named colors, `rgb()/rgba()`, `hsl()/hsla()` and `var(--token)`.
   Unsupported values are ignored and warn in development.
 
@@ -64,7 +64,7 @@ Field details:
 
 ### Selection and State
 
-- `value?: T`: controlled value. If set, the parent must pass the committed value back after `onValueChange`.
+- `value?: T`: controlled value. If you pass it, the parent must pass the committed value back after `onValueChange`.
 - `defaultValue?: T`: initial value for uncontrolled mode.
 - `onValueChange?: (value: T) => void`: called when selection commits.
 
@@ -86,18 +86,18 @@ Field details:
 - `optionDistribution?: "space-between" | "space-around"` (default: `"space-between"`)
 - `size?: "sm" | "md" | "lg"` (default: `"md"`)
 
-`optionSizing` controls option box dimensions:
+`optionSizing` decides how wide each option box should be:
 
 - `equal` measures the widest option content and uses that width for every option box.
 - `content` lets each option box follow its own content width.
 - `geometry.optionSize` resolves sizing to fixed square option boxes and overrides `optionSizing`.
 
-`optionDistribution` controls how option boxes sit inside the surface when the surface has extra space:
+`optionDistribution` only becomes visible when the surface has extra room:
 
 - `space-between` places spare space between option boxes.
 - `space-around` also adds spare space before the first and after the last option.
 
-Surface width itself comes from normal CSS layout. Without an explicit width, the root remains compact around its options.
+The surface width itself still comes from normal CSS layout. Without an explicit width, the root stays compact around its options.
 
 ### Accessibility
 
@@ -105,7 +105,7 @@ Surface width itself comes from normal CSS layout. Without an explicit width, th
 - `ariaLabelledby?: string`
 - `ariaDescribedby?: string`
 
-Use at least one group labelling strategy (`ariaLabel` or `ariaLabelledby`).
+Use at least one group labelling strategy: `ariaLabel` or `ariaLabelledby`.
 
 ### Styling Entry Points
 
@@ -121,11 +121,11 @@ Rendered slots do not receive `style={...}` from the component.
 
 What this means:
 
-- public theming stays overrideable from external CSS
+- public theming stays overrideable from app CSS
 - `slotProps.style` is not public API and is ignored at runtime
 - dynamic layout is written through an internal scoped stylesheet, not through element inline styles
 
-This separation is intentional:
+The split is deliberate:
 
 - public `--rsc-*` variables are for consumers
 - internal `--_rsc-*` variables are runtime mechanics and are not public API
@@ -139,11 +139,11 @@ This separation is intentional:
 - invalid structures return `null` and emit a dev warning
 - radiogroup labelling requires `ariaLabel` or `ariaLabelledby`
 
-This keeps runtime behavior deterministic for external consumers.
+That keeps runtime behavior predictable for consumers and avoids half-valid controls.
 
 ## CSP and Runtime Styles
 
-Dynamic geometry is written into a shared document stylesheet rather than inline slot styles.
+Dynamic geometry is written into a shared document stylesheet instead of inline slot styles.
 
 - pass `styleNonce` to attach a nonce to that stylesheet
 - instances in one document reuse the same stylesheet when they share a nonce
@@ -153,20 +153,20 @@ Dynamic geometry is written into a shared document stylesheet rather than inline
 
 Server rendering does not emit the internal runtime stylesheet.
 
-- rendering on the server does not access browser globals during render
+- server rendering does not access browser globals during render
 - the runtime stylesheet is attached on the client during the first layout effect after hydration
 - indicator geometry and measured layout settle on the client after hydration
 
 ## Mental Model
 
-Think about the component in four layers:
+The component is easier to reason about in four layers:
 
 1. `options`, selection props and interaction props define state and semantics.
-2. `geometry` defines the measured layout contract: where the indicator moves, how the track is measured, whether anchors exist and whether explicit option or indicator sizing is active.
+2. `geometry` defines what the component measures: where the indicator moves, how the track is measured, whether anchors exist and whether explicit option or indicator sizing is active.
 3. Public CSS variables, stable classes and stable data attributes define appearance.
 4. `slotProps` lets an app attach integration metadata, event observers and extra class names to the rendered slots.
 
-Use `geometry` when the layout math itself should change. Use CSS when the same mechanics should look different. Use `slotProps` when an outside system needs attributes, class names or event handlers on a specific slot.
+Use `geometry` when the component should measure or move differently. Use CSS when the same mechanics should look different. Use `slotProps` when another system needs attributes, class names or event handlers on a specific slot.
 
 ## `geometry`
 
@@ -207,15 +207,15 @@ Defaults:
 - `indicator.content: "none"`
 - `indicator.transition: "smooth"`
 
-During an active drag gesture, changing `options`, `orientation` or `geometry` cancels the in-flight drag.
-The control resets the preview state and the user can start a new drag after the update.
+During an active drag, changing `options`, `orientation` or `geometry` cancels the in-flight gesture.
+The control clears the preview state and the user can start a new drag after the update.
 
 ### `mode`
 
 - `"underlay"`: indicator participates as under-selection background.
 - `"overlay"`: indicator behaves like moving handle above options.
 
-Use `"underlay"` for classic segmented controls where selected state feels like a highlighted background behind the active option. Use `"overlay"` when the selected state should behave like a handle or capsule moving above the option labels.
+Use `"underlay"` for classic segmented controls where selection feels like a highlighted background behind the active option. Use `"overlay"` when selection should behave like a handle or capsule moving above the option labels.
 
 ### `dragScale`
 
@@ -230,7 +230,7 @@ Use `"underlay"` for classic segmented controls where selected state feels like 
 - Sets fixed square size for each option box.
 - Uses internal runtime layout values; no additional public styling hook is required.
 
-Use this for icon grids, compact tool pickers or any control where every option needs the same square target independent of label length. `optionSize` defines option-box dimensions; `optionDistribution` still controls how those boxes spread when the surface is wider than the boxes.
+Use this for icon grids, compact tool pickers or any control where every option needs the same square target, regardless of label length. `optionSize` defines option-box dimensions; `optionDistribution` still controls how those boxes spread when the surface is wider than the boxes.
 
 ### `anchor`
 
@@ -238,21 +238,21 @@ Use this for icon grids, compact tool pickers or any control where every option 
 - `width` and `height`: non-square anchor geometry.
 - If `width`/`height` are provided, they override `size` per axis.
 
-Anchors are invisible measurement targets by default. They are useful for overlay controls where the handle should move between compact targets inside wider option labels and they can be styled through `.rsc-option-anchor`.
+Anchors are invisible measurement targets by default. They are useful when an overlay handle should move between compact targets inside wider option labels. You can also style them through `.rsc-option-anchor`.
 
 ### `track.layout`
 
 - `"container"`: the track fills the control container.
 - `"center-span"`: the track starts at the center of the first option and ends at the center of the last option, using anchors when present.
 
-Use `"container"` for regular pill backgrounds. Use `"center-span"` for rail-like controls where the track should run through the option centers instead of filling the whole wrapper.
+Use `"container"` for regular pill backgrounds. Use `"center-span"` for rail-like controls where the track should run through option centers instead of filling the whole wrapper.
 
 ### `track.style`
 
 - `"surface"`: applies the default track paint.
 - `"none"`: keeps track geometry but removes default paint so CSS can draw the rail.
 
-`track.style = "none"` does not remove the track element. It keeps the `.rsc-track` slot available so custom CSS can draw a line, gradient, timeline rail or no visible track at all.
+`track.style = "none"` does not remove the track element. It keeps the `.rsc-track` slot available so your CSS can draw a line, gradient, timeline rail or no visible track at all.
 
 ### `indicator`
 
@@ -269,7 +269,7 @@ Axis precedence:
 - width resolution: `indicator.width ?? indicator.size`
 - height resolution: `indicator.height ?? indicator.size`
 
-Explicit indicator sizing is useful when the indicator should be a fixed handle instead of matching the selected option content. The measured dimensions are applied through internal runtime layout variables.
+Explicit indicator sizing is useful when the indicator should be a fixed handle instead of matching selected option content. The measured dimensions are applied through internal runtime layout variables.
 
 ### `indicator.transition`
 
@@ -278,7 +278,7 @@ Explicit indicator sizing is useful when the indicator should be a fixed handle 
 - `"smooth"` is the default and animates position and size changes.
 - `"instant"` updates position and size immediately.
 
-This controls selection indicator motion only. It does not delay value changes, change selection semantics or change drag preview timing.
+This controls the selection indicator only. It does not delay value changes, change selection semantics or change drag preview timing.
 
 ### `indicator.content = "clone-active"`
 
@@ -286,9 +286,9 @@ This controls selection indicator motion only. It does not delay value changes, 
 
 It does not reorder options. The option model stays fixed; this is selection preview, not drag-and-drop list behavior.
 
-Use it when the active value should travel with the handle, such as camera modes, compact icon + label pickers or controls that intentionally feel like a mini-slider. Skip it for heavy option content, dense controls where cloned content hurts readability or classic segmented controls where a plain selected highlight is clearer.
+Use it when the active value should travel with the handle: camera modes, compact icon + label pickers or controls that intentionally feel close to a small slider. Skip it for heavy option content, dense controls where cloned content hurts readability or classic segmented controls where a plain selected highlight is clearer.
 
-For most mode pickers, start with `indicator.content = "none"`. Reach for `clone-active` only when the moving value capsule is part of the intended interaction.
+For most mode pickers, start with `indicator.content = "none"`. Reach for `clone-active` only when the moving value capsule is part of the interaction you want.
 
 Recipe (`overlay + clone-active`):
 
@@ -332,22 +332,22 @@ type SegmentedChoiceSlotProps = {
 };
 ```
 
-What `slotProps` is for:
+Use `slotProps` to:
 
 - add `className`
 - add `data-*` attributes
 - add non-conflicting `aria-*` attributes
 - attach event handlers
 
-What it is not for:
+Do not use it for:
 
-- inline styling (`style`) is not part of public API and is ignored.
+- inline styling. `style` is not public API and is ignored.
 - owning root radiogroup semantics such as `role`, `ariaLabel`, `ariaLabelledby`, `ariaDescribedby` or `aria-orientation`.
 
 Handler ordering:
 
 - internal list pointer/focus handlers run before `slotProps.list` handlers
-- user handlers should observe or augment list interactions, not depend on canceling internal drag/commit logic with `preventDefault()`
+- user handlers should observe or add to list interactions, not depend on canceling internal drag or commit logic with `preventDefault()`
 
 Slot map:
 
@@ -364,8 +364,8 @@ Slot map:
 | `optionLabel`       | `.rsc-option-label` primary label wrapper        |
 | `optionDescription` | `.rsc-option-description` secondary text wrapper |
 
-Use `slotProps` when you need to attach integration metadata, event observers or extra class names to one of these slots.
-Use CSS selectors against the stable class hooks below when you only need visual styling.
+Use `slotProps` when you need integration metadata, event observers or extra class names on one of these slots.
+Use CSS selectors against the stable class hooks below when the change is only visual.
 
 Example:
 
@@ -388,7 +388,7 @@ Example:
 
 ## Stable Class Hooks
 
-These are the stable selectors for the slots listed in the `slotProps` map:
+These selectors match the slots listed in the `slotProps` map:
 
 ```css
 .rsc-root
@@ -408,9 +408,9 @@ Use `.rsc-root` or your own root `className` to scope a theme.
 Use `.rsc-option`, `.rsc-option-content`, `.rsc-option-label` and `.rsc-option-description` for option styling.
 Use `.rsc-track`, `.rsc-indicator`, `.rsc-indicator-content` and `.rsc-option-anchor` for geometry-driven visuals such as rails, handles, cloned content, anchors, rings or release feedback.
 
-The `.rsc-option-input` hook exists because the native radio input is part of the public DOM structure. In normal styling, leave the input visually hidden and style the visible option slots instead.
+The `.rsc-option-input` hook exists because the native radio input is part of the public DOM structure. In normal styling, leave that input visually hidden and style the visible option slots instead.
 
-Class hooks describe structure. Data attributes describe state and resolved configuration. In most custom themes, use both together:
+Class hooks describe structure. Data attributes describe state. In most custom themes, use both together:
 
 ```css
 .billing-range .rsc-option[data-selected='true'] .rsc-option-content {
@@ -437,13 +437,13 @@ Option attrs:
 - `data-has-description`: `"true"` when `option.description` is present.
 - `data-previewed`: `"true"` on the option currently targeted during an active drag. It can differ from `data-selected` until pointer release commits the value.
 
-Internal runtime selectors use `data-rsc-*`. They are owned by the bundled stylesheet and scoped runtime layout system and are not supported as public customization API.
+Internal runtime selectors use `data-rsc-*`. They are owned by the bundled stylesheet and scoped runtime layout system. Do not treat them as public customization API.
 
 ## Data Attribute Scoping Best Practices
 
-Rule:
+Keep these selectors scoped:
 
-- Always scope option-state selectors by component hooks such as `.rsc-root` and `.rsc-option`.
+- Scope option-state selectors by component hooks such as `.rsc-root` and `.rsc-option`.
 - Prefer a user-owned class on the root when styling one control instance.
 - Avoid global bare `[data-*]` selectors. These attrs use simple names and may exist elsewhere in your app.
 
@@ -477,11 +477,9 @@ Don't:
 
 ## Stable CSS Variables
 
-These are public `--rsc-*` tokens intended for external CSS overrides.
+These public `--rsc-*` tokens are the normal CSS override surface.
 
-Import `react-segmented-choice/styles.css` before your app or component CSS so
-your overrides can naturally customize these variables and stable `.rsc-*`
-hooks.
+Import `react-segmented-choice/styles.css` before your app or component CSS so your overrides win in normal cascade order.
 
 ### Surface and color
 
@@ -560,11 +558,11 @@ Internal:
 - owned by component runtime layout logic
 - not covered by semver or public docs
 
-Do not build app-level styling contracts on top of `--_rsc-*` or `data-rsc-*`.
+Do not build app-level styling contracts on `--_rsc-*` or `data-rsc-*`.
 
 ## Practical Examples
 
-This section keeps compact code examples close to the API reference. For broader runnable examples, use Storybook locally with `pnpm storybook` or browse the hosted build at [sb.segmentedchoice.visiofutura.com](https://sb.segmentedchoice.visiofutura.com/).
+These examples stay close to the API reference. For more visual recipes, run Storybook with `pnpm storybook` or browse the hosted build at [sb.segmentedchoice.visiofutura.com](https://sb.segmentedchoice.visiofutura.com/).
 
 ### 1) Controlled value
 
@@ -583,7 +581,7 @@ const [value, setValue] = useState('week');
 />;
 ```
 
-Use controlled mode when selection is owned by app state, URL state, a form library or another external store. The component calls `onValueChange` when a new value commits and the parent passes that value back through `value`.
+Use controlled mode when selection belongs to app state, URL state, a form library or another external store. The component calls `onValueChange` when a new value commits; the parent passes that value back through `value`.
 
 ### 2) Uncontrolled value
 
@@ -602,7 +600,7 @@ Use controlled mode when selection is owned by app state, URL state, a form libr
 />
 ```
 
-Use uncontrolled mode when the control can manage its own selected value after the initial render. `defaultValue` is the initial selection; if it is missing or invalid, the component falls back to the first enabled option.
+Use uncontrolled mode when the control can own its selected value after the first render. `defaultValue` is the initial selection; if it is missing or invalid, the component falls back to the first enabled option.
 
 ### 3) Icon or non-text labels
 
@@ -662,9 +660,9 @@ When `label` is not readable text, provide `ariaLabel` on the option. The group 
 }
 ```
 
-This pattern uses `center-span` to position the track from the first option center to the last option center. The styled `.rsc-track` becomes the visible rail, explicit anchors provide compact targets and a fixed indicator moves along that rail.
+This pattern uses `center-span` to run the track from the first option center to the last option center. The styled `.rsc-track` becomes the visible rail, explicit anchors provide compact targets and a fixed indicator moves along that rail.
 
-With `track.style = "none"`, the component does not draw the default surface; the visible rail and label placement are yours to style with CSS. You can keep labels centered and size the anchors around them, move labels above or below the rail or use another layout that fits your design. This example moves the labels below the rail only to keep the rail shape easy to read.
+With `track.style = "none"`, the component does not draw the default surface. The visible rail and label placement are yours to style with CSS. This example moves labels below the rail only to keep the rail shape easy to read.
 
 ### 5) Overlay with `clone-active`
 
@@ -688,7 +686,7 @@ With `track.style = "none"`, the component does not draw the default surface; th
 />
 ```
 
-Use `clone-active` when the moving overlay should carry the active option content. It previews the target selection during drag and does not reorder options.
+Use `clone-active` when the moving overlay should carry the active option content. It previews the target selection during drag. It does not reorder options.
 
 ### 6) Slot-level analytics attrs
 
@@ -742,7 +740,7 @@ Use `clone-active` when the moving overlay should carry the active option conten
 }
 ```
 
-`data-selected` is the committed value. `data-previewed` is the drag target and only appears while dragging.
+`data-selected` is the committed value. `data-previewed` is the drag target and appears only while dragging.
 
 ### 8) CSS-first theming
 
@@ -806,7 +804,7 @@ Use `clone-active` when the moving overlay should carry the active option conten
 }
 ```
 
-`unstyled` removes the bundled visual skin, not the behavior or DOM structure. The stable slots, radio semantics, keyboard behavior, drag behavior and geometry logic still apply.
+`unstyled` removes the bundled visual skin, not the behavior or DOM structure. Stable slots, radio semantics, keyboard behavior, drag behavior and geometry logic still apply.
 
 ### 10) Complex domain objects through string IDs
 
@@ -834,22 +832,21 @@ const byId = new Map(plans.map(plan => [plan.id, plan.value]));
 />;
 ```
 
-Keep rich values in your app model and pass stable string IDs to the component. This keeps DOM values, form behavior and TypeScript generics aligned with the public `SegmentedChoiceValue = string` contract.
+Keep rich values in your app model and pass stable string IDs to the component. That keeps DOM values, form behavior and TypeScript generics aligned with the public `SegmentedChoiceValue = string` contract.
 
 ## Guidance: `geometry` vs CSS vs `slotProps`
 
-Use this split to avoid API confusion:
+Use this split when you are deciding where a customization belongs:
 
 - `geometry`: mechanics and layout math.
 - internal runtime stylesheet: instance-scoped layout values.
 - CSS variables and selectors: look and theme.
 - `slotProps`: attrs/events/class hooks for integration.
 
-If a customization can be expressed in CSS, prefer CSS over adding new JS props.
+If a customization can be expressed in CSS, prefer CSS over adding a new JS prop.
 
 For drag feedback, `data-dragging` marks the active pointer drag phase.
-`data-drag-released` is briefly `true` after a pointer drag ends and is intended for optional CSS-only release feedback.
-The library exposes this state hook but does not ship a default release animation.
+`data-drag-released` is briefly `true` after a pointer drag ends. It is there for optional CSS-only release feedback; the library does not ship a default release animation.
 
 ## Browser Support
 

@@ -13,7 +13,11 @@ import { SegmentedChoiceOptionText } from './components/SegmentedChoiceOptionTex
 import { useControllableValue } from './hooks/useControllableValue';
 import { useDragSelection } from './hooks/useDragSelection';
 import { useEqualDistributionLayout } from './hooks/useEqualDistributionLayout';
-import { useIndicatorLayout } from './hooks/useIndicatorLayout';
+import {
+  measureIndicatorLayout,
+  useIndicatorLayout,
+  type IndicatorLayout,
+} from './hooks/useIndicatorLayout';
 import { useSegmentedChoiceInteractions } from './hooks/useSegmentedChoiceInteractions';
 import { useTrackLayout } from './hooks/useTrackLayout';
 import { buildSegmentedChoiceRuntimeRule } from './internal/buildSegmentedChoiceRuntimeRule';
@@ -92,6 +96,12 @@ function resolveShouldRenderAnchor({
 
 function isNearLayoutSize(measured: number, expected: number) {
   return Math.abs(measured - expected) < 0.5;
+}
+
+function getIndicatorLayoutSignature(
+  layout: Pick<IndicatorLayout, 'height' | 'width' | 'x' | 'y'>
+) {
+  return [layout.x, layout.y, layout.width, layout.height].join('|');
 }
 
 function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
@@ -327,7 +337,14 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     sizeAdjustment: indicatorSizeAdjustment,
     useRenderedIndicatorSize: hasExplicitIndicatorSize,
   });
-  const [indicatorMotionState, setIndicatorMotionState] = useState<'initial' | 'ready'>('initial');
+  const [indicatorMotionState, setIndicatorMotionState] = useState<'initial' | 'settled' | 'ready'>(
+    'initial'
+  );
+  const latestInitialIndicatorLayoutSignatureRef = useRef('');
+  const stableInitialIndicatorLayoutRef = useRef<{
+    frameCount: number;
+    signature: string;
+  } | null>(null);
   const trackLayout = useTrackLayout({
     listRef,
     measureRefs: anchorRefs,
@@ -380,6 +397,9 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
         ? 'grab'
         : 'pointer';
   const listTouchAction = !disabled && draggable ? 'none' : undefined;
+  const indicatorLayoutSignature = getIndicatorLayoutSignature(indicatorLayout);
+
+  latestInitialIndicatorLayoutSignatureRef.current = indicatorLayoutSignature;
 
   useLayoutEffect(() => {
     optionRefs.current.length = options.length;
@@ -396,40 +416,106 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
       (isNearLayoutSize(indicatorLayout.width, expectedFixedIndicatorSize) &&
         isNearLayoutSize(indicatorLayout.height, expectedFixedIndicatorSize));
 
+    if (indicatorMotionState === 'settled') {
+      let frame = 0;
+      frame = window.requestAnimationFrame(() => {
+        setIndicatorMotionState('ready');
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
+    }
+
     if (
       indicatorMotionState !== 'initial' ||
       !hasMeasuredIndicatorLayout ||
       !hasSettledFixedIndicatorSize ||
       typeof window === 'undefined'
     ) {
+      if (indicatorMotionState !== 'ready') {
+        stableInitialIndicatorLayoutRef.current = null;
+      }
       return;
     }
 
     let frame = 0;
-    const releaseAfterPaint = (remainingFrames: number) => {
+    const releaseWhenLayoutIsStable = () => {
       frame = window.requestAnimationFrame(() => {
-        if (remainingFrames <= 1) {
-          setIndicatorMotionState('ready');
+        const measuredIndicatorLayout = measureIndicatorLayout({
+          activeIndex,
+          centerToOption: indicatorCentersOnOption,
+          indicatorRef,
+          inset: indicatorCentersOnOption ? 0 : indicatorInsetPx,
+          listRef,
+          measureRefs: anchorRefs,
+          optionRefs,
+          sizeAdjustment: indicatorSizeAdjustment,
+          useRenderedIndicatorSize: hasExplicitIndicatorSize,
+        });
+
+        if (!measuredIndicatorLayout) {
+          stableInitialIndicatorLayoutRef.current = null;
+          releaseWhenLayoutIsStable();
           return;
         }
 
-        releaseAfterPaint(remainingFrames - 1);
+        const measuredIndicatorLayoutSignature =
+          getIndicatorLayoutSignature(measuredIndicatorLayout);
+
+        if (
+          measuredIndicatorLayoutSignature !== indicatorLayoutSignature ||
+          latestInitialIndicatorLayoutSignatureRef.current !== indicatorLayoutSignature
+        ) {
+          stableInitialIndicatorLayoutRef.current = null;
+          releaseWhenLayoutIsStable();
+          return;
+        }
+
+        const currentStableLayout = stableInitialIndicatorLayoutRef.current;
+        const nextStableLayout =
+          currentStableLayout?.signature === indicatorLayoutSignature
+            ? {
+                frameCount: currentStableLayout.frameCount + 1,
+                signature: indicatorLayoutSignature,
+              }
+            : {
+                frameCount: 1,
+                signature: indicatorLayoutSignature,
+              };
+
+        stableInitialIndicatorLayoutRef.current = nextStableLayout;
+
+        if (nextStableLayout.frameCount >= 2) {
+          setIndicatorMotionState('settled');
+          return;
+        }
+
+        releaseWhenLayoutIsStable();
       });
     };
 
-    releaseAfterPaint(2);
+    releaseWhenLayoutIsStable();
 
     return () => {
       window.cancelAnimationFrame(frame);
     };
   }, [
+    activeIndex,
+    anchorRefs,
     expectedFixedIndicatorSize,
+    hasExplicitIndicatorSize,
+    indicatorCentersOnOption,
+    indicatorInsetPx,
     indicatorLayout.height,
     indicatorLayout.isVisible,
     indicatorLayout.width,
-    indicatorLayout.x,
-    indicatorLayout.y,
+    indicatorLayoutSignature,
     indicatorMotionState,
+    indicatorRef,
+    indicatorSizeAdjustment,
+    listRef,
+    optionRefs,
   ]);
 
   const optionRowRefs = {
@@ -454,6 +540,10 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     resolvedName,
     shouldRenderAnchor,
   };
+  const renderedIndicatorLayout = {
+    ...indicatorLayout,
+    isVisible: indicatorMotionState !== 'initial' && indicatorLayout.isVisible,
+  };
 
   const instanceStyleText = buildSegmentedChoiceRuntimeRule({
     anchorHeight: anchorConfig.height,
@@ -463,7 +553,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     indicatorColor: indicatorOption?.accentColor,
     indicatorCursor: interactiveCursor,
     indicatorHeight: indicatorConfig.height !== undefined ? indicatorConfig.height : undefined,
-    indicatorLayout,
+    indicatorLayout: renderedIndicatorLayout,
     indicatorScale,
     indicatorWidth: indicatorConfig.width !== undefined ? indicatorConfig.width : undefined,
     instanceId,
@@ -508,7 +598,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
       }
       data-rsc-drag-previewing={dragPreviewing ? 'true' : 'false'}
       data-rsc-indicator-content-mode={indicatorConfig.contentMode}
-      data-rsc-indicator-motion={indicatorMotionState === 'initial' ? 'initial' : undefined}
+      data-rsc-indicator-motion={indicatorMotionState !== 'ready' ? 'initial' : undefined}
       data-rsc-indicator-style={indicatorConfig.style}
       data-rsc-indicator-transition={indicatorConfig.transition}
       data-rsc-instance={instanceId}

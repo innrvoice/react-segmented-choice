@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Curated visual stories for the geometry, runtime data attributes and CSS-first customization model.',
+          'Visual notes for the parts that matter when the default pill control is not enough: geometry, runtime state attrs and CSS-first styling.',
       },
     },
     controls: {
@@ -1326,7 +1326,7 @@ export const MentalModelPipeline: ArchitectureStory = {
       <ArchitecturePage
         kicker="Foundations"
         title="Geometry decides mechanics. CSS decides appearance."
-        description="Use geometry for layout mechanics. Use CSS for appearance. Measured positions stay inside the component runtime stylesheet while consumers style public slots, state attrs and CSS variables."
+        description="Geometry changes what the component measures and moves. CSS changes how that measured result looks. Runtime numbers stay inside the component stylesheet while app CSS uses public slots, state attrs and variables."
       >
         <div className="pipeline-flow">
           <div className="architecture-panel pipeline-demo">
@@ -1361,12 +1361,12 @@ export const MentalModelPipeline: ArchitectureStory = {
                 <div className="pipeline-summary-step">
                   <strong>Runtime measures layout</strong>
                   <span>
-                    The component positions the track and indicator from rendered option geometry.
+                    The component positions the track and indicator from the rendered options.
                   </span>
                 </div>
                 <div className="pipeline-summary-step">
                   <strong>CSS paints the result</strong>
-                  <span>Consumers theme public slots, state attrs and CSS variables.</span>
+                  <span>App CSS themes public slots, state attrs and CSS variables.</span>
                 </div>
               </div>
             </div>
@@ -1418,8 +1418,8 @@ export const MentalModelPipeline: ArchitectureStory = {
               </div>
               <p className="architecture-card-copy">
                 Measured positions, transforms and track spans are emitted through the scoped
-                runtime stylesheet. Treat those values as implementation mechanics. App CSS should
-                use documented classes, attrs and public
+                runtime stylesheet. Treat those values as mechanics. App CSS should use documented
+                classes, attrs and public
                 <CodeChip>--rsc-*</CodeChip> variables instead of internal runtime values.
               </p>
             </div>
@@ -1440,14 +1440,14 @@ export const TrackAsAxis: ArchitectureStory = {
       <ArchitecturePage
         kicker="Track system"
         title="Track layout changes measurement. Track style changes paint."
-        description='The default `track.style: "surface"` paints the track. `track.layout` decides whether that surface fills the container or is measured between anchor centers. `track.style: "none"` keeps the same geometry without painting the track.'
+        description="`track.layout` decides what gets measured. `track.style` decides whether the library paints that track for you. Turn paint off when your design needs its own rail."
       >
         <div className="architecture-grid architecture-grid--two track-comparison">
           <div className="architecture-panel track-scene">
             <div>
               <h2 className="architecture-card-title">Default surface</h2>
               <p className="architecture-card-copy">
-                The common case uses surface paint and lets the track fill the control container.
+                The common case paints a surface and lets the track fill the control container.
               </p>
             </div>
             <div className="architecture-choice-wrap">
@@ -1474,8 +1474,8 @@ export const TrackAsAxis: ArchitectureStory = {
             <div>
               <h2 className="architecture-card-title">Center-span surface</h2>
               <p className="architecture-card-copy">
-                The paint is still the default surface. Only the measured span changes: first anchor
-                center to last anchor center.
+                The paint stays ordinary. Only the measured span changes: first anchor center to
+                last anchor center.
               </p>
             </div>
             <div className="architecture-choice-wrap">
@@ -1507,8 +1507,8 @@ export const TrackAsAxis: ArchitectureStory = {
             <div>
               <h2 className="architecture-card-title">Surface paint</h2>
               <p className="architecture-card-copy">
-                `track.style: "surface"` is the default painted track, including with center-span
-                measurement.
+                `track.style: "surface"` is the default painted track, including when the measured
+                span comes from anchors.
               </p>
             </div>
             <SegmentedChoice
@@ -1534,8 +1534,8 @@ export const TrackAsAxis: ArchitectureStory = {
             <div>
               <h2 className="architecture-card-title">No track paint</h2>
               <p className="architecture-card-copy">
-                `track.style: "none"` leaves the same measured geometry, but the library does not
-                paint the track surface.
+                `track.style: "none"` keeps the same measured geometry, but leaves track paint to
+                your CSS.
               </p>
             </div>
             <SegmentedChoice
@@ -1578,7 +1578,7 @@ export const SurfaceDistributionModel: ArchitectureStory = {
       <ArchitecturePage
         kicker="Option layout"
         title="Surface width is separate from option layout."
-        description="optionSizing decides each option box. CSS decides whether the surface is compact or wide. optionDistribution only becomes visible when that surface has spare space."
+        description="`optionSizing` decides each option box. CSS decides whether the surface is compact or wide. `optionDistribution` only matters once that surface has spare room."
       >
         <div className="surface-model-grid">
           <div className="surface-model-card">
@@ -1586,7 +1586,7 @@ export const SurfaceDistributionModel: ArchitectureStory = {
               <h2 className="architecture-card-title">default compact surface</h2>
               <p className="architecture-card-copy">
                 With no explicit surface width, the control wraps its option boxes. Distribution is
-                still part of the contract, but there is no spare space to see.
+                still part of the contract, but there is almost no spare space to see.
               </p>
             </div>
             <div className="surface-model-visual">
@@ -1647,8 +1647,8 @@ export const SurfaceDistributionModel: ArchitectureStory = {
             <div>
               <h2 className="architecture-card-title">explicit wide surface + space-between</h2>
               <p className="architecture-card-copy">
-                When consumer CSS gives the surface width, the same option boxes distribute across
-                that space. Option sizing still decides the box dimensions.
+                When app CSS gives the surface width, the same option boxes distribute across that
+                space. Option sizing still decides the box dimensions.
               </p>
             </div>
             <div className="surface-model-visual">
@@ -1743,7 +1743,7 @@ export const SurfaceDistributionModel: ArchitectureStory = {
             <h2 className="architecture-card-title">The contract</h2>
             <p className="architecture-card-copy">
               Default controls are compact because no width is assigned. If CSS makes the surface
-              wider, optionDistribution decides how already-sized option boxes use that extra space.
+              wider, optionDistribution decides how already-sized option boxes use the extra space.
             </p>
           </div>
           <CodeBlock>{`<SegmentedChoice
@@ -1773,7 +1773,7 @@ export const IndicatorModesMap: ArchitectureStory = {
       <ArchitecturePage
         kicker="Indicator system"
         title="One moving geometry, several visual contracts."
-        description="The indicator is always driven by selection geometry. Mode changes its layer, style changes its paint, content can clone the active option and transition controls geometry motion."
+        description="The indicator always follows selection geometry. Mode changes its layer, style changes its paint, cloned content changes what travels with it and transition controls motion."
       >
         <div className="indicator-map">
           <div className="architecture-note architecture-note--prose indicator-note">
@@ -1808,7 +1808,9 @@ export const IndicatorModesMap: ArchitectureStory = {
           <div className="indicator-cell">
             <div className="indicator-cell-heading">
               <strong>overlay + fill</strong>
-              <span>A handle above options. Useful for slider-like controls.</span>
+              <span>
+                A handle above options. Useful when a control should feel closer to a slider.
+              </span>
             </div>
             <SegmentedChoice
               ariaLabel="Overlay fill"
@@ -1830,7 +1832,7 @@ export const IndicatorModesMap: ArchitectureStory = {
           <div className="indicator-cell">
             <div className="indicator-cell-heading">
               <strong>overlay + ring</strong>
-              <span>The same geometry with transparent fill and a visible border.</span>
+              <span>The same geometry, painted as a border instead of a filled capsule.</span>
             </div>
             <SegmentedChoice
               ariaLabel="Overlay ring"
@@ -1853,7 +1855,7 @@ export const IndicatorModesMap: ArchitectureStory = {
             <div className="indicator-cell-heading">
               <strong>none</strong>
               <span>
-                The library indicator is not painted. This card colors the selected option with CSS.
+                The library indicator is not painted. This card lets CSS color the selected option.
               </span>
             </div>
             <SegmentedChoice
@@ -1876,7 +1878,7 @@ export const IndicatorModesMap: ArchitectureStory = {
           <div className="indicator-cell">
             <div className="indicator-cell-heading">
               <strong>clone-active</strong>
-              <span>Overlay indicator carries the selected option content as a value capsule.</span>
+              <span>The overlay indicator carries selected option content as a value capsule.</span>
             </div>
             <SegmentedChoice
               ariaLabel="Clone active"
@@ -1896,7 +1898,7 @@ export const IndicatorModesMap: ArchitectureStory = {
           <div className="indicator-cell">
             <div className="indicator-cell-heading">
               <strong>transition</strong>
-              <span>Same selected geometry, different movement policy.</span>
+              <span>The same selected geometry with a different movement policy.</span>
             </div>
             <div className="transition-compare">
               <div className="transition-panel">
@@ -1948,7 +1950,7 @@ export const GeometrySizing: ArchitectureStory = {
       <ArchitecturePage
         kicker="Geometry sizing"
         title="Sizing props change what the component measures."
-        description="Use optionSize for fixed option boxes, anchor width and height for compact measurement targets and indicator width and height for fixed selection geometry. The measured layout details stay component-owned."
+        description="Use `optionSize` for fixed option boxes, anchors for compact measurement targets and indicator width or height for fixed selection geometry. The measured details stay component-owned."
       >
         <div className="sizing-scene">
           <div className="sizing-stack">
@@ -2044,7 +2046,7 @@ export const GeometrySizing: ArchitectureStory = {
             <div className="sizing-var-row">
               <CodeChip>geometry.optionSize</CodeChip>
               <span className="architecture-card-copy">
-                Sets fixed square option boxes while measurement details stay internal.
+                Sets fixed square option boxes while measurement details stay inside the component.
               </span>
             </div>
             <div className="sizing-var-row">
@@ -2084,8 +2086,8 @@ export const DataAttrStylingContract: ArchitectureStory = {
       <ArchitecturePage
         compact
         kicker="CSS-first customization"
-        title="Attrs are the bridge from runtime state to external CSS."
-        description="Committed value, disabled options and pointer drag state appear as stable data attributes. Consumer CSS reads those attrs and paints the visible state while internal runtime variables stay private."
+        title="Runtime state becomes ordinary CSS selectors."
+        description="Committed value, disabled options and drag preview state appear as stable data attributes. App CSS reads those attrs and paints the visible state while internal runtime variables stay private."
       >
         <div className="contract-scene">
           <div className="architecture-panel contract-hero">
@@ -2183,8 +2185,8 @@ export const DataAttrStylingContract: ArchitectureStory = {
             <div className="contract-selector">
               <span className="contract-selector-title">Disabled state</span>
               <p className="contract-selector-copy">
-                Disabled is not only a prop. Each disabled option also exposes a stable option attr
-                that CSS can target.
+                Disabled is not only a prop. Each disabled option also exposes a stable attr for
+                state styling.
               </p>
               <CodeBlock>{`.contract-choice
   .rsc-option[data-disabled="true"]
@@ -2204,7 +2206,7 @@ export const DataAttrStylingContract: ArchitectureStory = {
             <div className="contract-selector">
               <span className="contract-selector-title">Interaction state</span>
               <p className="contract-selector-copy">
-                During pointer drag, root and option attrs describe the live preview before release
+                During pointer drag, root and option attrs describe the preview before release
                 commits the next value.
               </p>
               <CodeBlock>{`.contract-choice.rsc-root[data-dragging="true"]
