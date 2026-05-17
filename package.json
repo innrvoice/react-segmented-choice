@@ -1,6 +1,6 @@
 {
   "name": "react-segmented-choice",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Accessible React segmented control with CSS-first customization, native radio semantics, drag-to-select interaction and customizable indicator geometry.",
   "keywords": [
     "a11y",

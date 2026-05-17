@@ -77,6 +77,7 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
   const activePointerIdRef = useRef<number | null>(null);
   const activePointerElementRef = useRef<HTMLDivElement | null>(null);
   const dragReleasedTimeoutRef = useRef<number | null>(null);
+  const dragPreviewingRef = useRef(false);
   const initialIndexRef = useRef<number>(-1);
   const initialCoordinateRef = useRef<number | null>(null);
   const lastCoordinateRef = useRef<number | null>(null);
@@ -197,6 +198,7 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
     lastDirectionRef.current = 0;
     activePointerElementRef.current = null;
     setDragging(false);
+    dragPreviewingRef.current = false;
     setDragPreviewing(false);
     if (!preserveLayout) {
       setDragLayout(null);
@@ -311,10 +313,12 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
       lastCoordinateRef.current = initialCoordinateRef.current;
       initialLayoutRef.current = initialLayout;
       const initialProjection = startsFromListSurface ? getProjection(pointerCoordinate) : null;
+      const initialDragPreviewing = initialProjection !== null;
 
       setDragLayout(initialProjection?.layout ?? initialLayoutRef.current);
       setDragging(true);
-      setDragPreviewing(initialProjection !== null);
+      dragPreviewingRef.current = initialDragPreviewing;
+      setDragPreviewing(initialDragPreviewing);
       setPreviewIndex(
         initialProjection?.resolvedIndex !== undefined && initialProjection.resolvedIndex >= 0
           ? initialProjection.resolvedIndex
@@ -364,6 +368,7 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
 
       const projection = getProjection(coordinate);
       if (projection) {
+        dragPreviewingRef.current = true;
         setDragPreviewing(true);
         setDragLayout(projection.layout);
         if (projection.resolvedIndex >= 0) {
@@ -381,6 +386,7 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
       }
 
       const projection = getProjection(getAxisCoordinate(orientation, event.nativeEvent));
+      const wasDragPreviewing = dragPreviewingRef.current;
       if (projection?.resolvedIndex !== undefined && projection.resolvedIndex >= 0) {
         setDragLayout(projection.layout);
         onCommitIndex(projection.resolvedIndex);
@@ -388,7 +394,9 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
 
       releaseActivePointerCapture(activePointerIdRef.current);
       reset({ preserveLayout: projection !== null });
-      startDragReleased();
+      if (wasDragPreviewing) {
+        startDragReleased();
+      }
     },
     [
       getProjection,
@@ -406,8 +414,11 @@ export function useDragSelection<T extends SegmentedChoiceValue>({
         return;
       }
 
+      const wasDragPreviewing = dragPreviewingRef.current;
       cancelDrag();
-      startDragReleased();
+      if (wasDragPreviewing) {
+        startDragReleased();
+      }
     },
     [cancelDrag, startDragReleased]
   );

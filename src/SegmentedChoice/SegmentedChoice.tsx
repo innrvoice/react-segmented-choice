@@ -379,19 +379,20 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     optionCount: options.length,
   });
   const activeOption = activeIndex >= 0 ? options[activeIndex] : undefined;
+  const dragActive = dragging && dragPreviewing;
   const indicatorOption =
-    selectionMode === 'overlay' && dragging
+    selectionMode === 'overlay' && dragActive
       ? options[previewIndex ?? committedIndex]
       : activeOption;
   const dragScaleValue = resolveDragScale(dragScale);
-  const indicatorScale = dragging ? dragScaleValue : 1;
+  const indicatorScale = dragActive ? dragScaleValue : 1;
   const shouldCloneIndicatorContent =
     selectionMode === 'overlay' &&
     indicatorConfig.contentMode === 'clone-active' &&
     indicatorOption !== undefined;
   const interactiveCursor = disabled
     ? undefined
-    : dragging && draggable
+    : dragActive && draggable
       ? 'grabbing'
       : draggable
         ? 'grab'
@@ -533,7 +534,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
   const optionRowState = {
     currentValue,
     disabled,
-    dragging,
+    dragging: dragActive,
     focusVisibleIndex,
     previewIndex,
     required,
@@ -591,7 +592,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
       className={joinClassNames('rsc-root', className, normalizedSlotProps.root.className)}
       data-disabled={disabled ? 'true' : 'false'}
       data-drag-released={dragReleased ? 'true' : 'false'}
-      data-dragging={dragging ? 'true' : 'false'}
+      data-dragging={dragActive ? 'true' : 'false'}
       data-orientation={orientation}
       data-rsc-anchor-sizing={
         anchorConfig.width !== undefined || anchorConfig.height !== undefined ? 'explicit' : 'fill'
