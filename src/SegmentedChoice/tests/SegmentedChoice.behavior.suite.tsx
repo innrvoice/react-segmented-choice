@@ -2952,6 +2952,57 @@ export function registerSegmentedChoiceBehaviorSuite() {
     });
   });
 
+  it('keeps initial motion suppressed until vertical indicator position is stable', async () => {
+    const options = [
+      { value: 'cursor', label: 'Cursor' },
+      { value: 'pen', label: 'Pen' },
+      { value: 'text', label: 'Text' },
+      { value: 'frame', label: 'Frame' },
+    ] as const;
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Tools"
+        geometry={{
+          mode: 'overlay',
+          optionSize: 64,
+          indicator: { borderWidth: 3, style: 'ring' },
+          track: { style: 'none' },
+        }}
+        orientation="vertical"
+        options={options}
+        value="frame"
+      />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+
+    setElementRect(list, { left: 0, top: 0, width: 64, height: 256 });
+    setRectsForAxis(labels, 'vertical', { size: 64, gap: 0, crossSize: 64 });
+    setElementRect(labels[3] as Element, { left: 0, top: 64, width: 64, height: 64 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('70px');
+      expect(getCssVar(root, '--_rsc-indicator-height')).toBe('70px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('-3px,61px');
+      expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    });
+
+    setElementRect(labels[3] as Element, { left: 0, top: 192, width: 64, height: 64 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('-3px,189px');
+      expect(root.dataset.rscIndicatorMotion).toBe('initial');
+    });
+
+    await waitFor(() => {
+      expect(root.dataset.rscIndicatorMotion).toBeUndefined();
+    });
+  });
+
   it('moves the underlay content-width indicator from old geometry to clicked geometry', async () => {
     const options = [
       { value: 'deep', label: 'Deep Focus' },

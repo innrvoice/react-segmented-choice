@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Core state references covering uncontrolled usage, controlled state and disabled variants.',
+          'State references for the cases most apps hit first: controlled value, default value and disabled choices.',
       },
     },
   },
@@ -111,7 +111,7 @@ export const Controlled: Story = {
     docs: {
       description: {
         story:
-          'A controlled example with a live readout, useful for integrating SegmentedChoice into stateful application logic.',
+          'A controlled example with a live readout, matching the shape used when selection belongs to app state.',
       },
     },
   },
@@ -133,7 +133,8 @@ export const Uncontrolled: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'An uncontrolled baseline that relies on `defaultValue` and internal state only.',
+        story:
+          'An uncontrolled baseline: pass `defaultValue`, then let the control own the selected value.',
       },
     },
   },
@@ -157,7 +158,7 @@ export const Disabled: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Shows the fully disabled state where the entire control is non-interactive.',
+        story: 'The whole control disabled, including pointer, keyboard and form interaction.',
       },
     },
   },
@@ -180,7 +181,8 @@ export const PartiallyDisabled: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Demonstrates mixed availability where disabled options coexist with enabled ones.',
+        story:
+          'Enabled and disabled options in the same group, for choices that are temporarily unavailable.',
       },
     },
   },
@@ -198,7 +200,7 @@ export const KeyboardFocusVisible: Story = {
     docs: {
       description: {
         story:
-          'Shows the keyboard-visible focus treatment on a selected option so focus-ring regressions are caught visually.',
+          'Shows the keyboard-visible focus treatment on a selected option, where regressions are easiest to miss.',
       },
     },
   },

@@ -89,7 +89,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Baseline SegmentedChoice variants for orientation and content-shape reference without extra product styling.',
+          'Plain SegmentedChoice variants for checking orientation and content shape before adding a custom skin.',
       },
     },
   },
@@ -156,7 +156,8 @@ export const TextOnlyHorizontal: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'The baseline horizontal variant with text-only labels and no extra custom styling.',
+        story:
+          'The plain horizontal control: text labels, default skin and no product-specific styling.',
       },
     },
   },
@@ -175,8 +176,7 @@ export const IconOnlyHorizontal: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'An icon-only horizontal control that demonstrates required option aria labels and compact visual chips.',
+        story: 'An icon-only control with readable option aria labels and small visual chips.',
       },
     },
   },
@@ -201,7 +201,7 @@ export const TextOnlyVertical: Story = {
     docs: {
       description: {
         story:
-          'The default vertical layout with text-only labels, useful as the simplest orientation reference.',
+          'The same text-only control arranged vertically, useful when a sidebar or tool rail needs real radio semantics.',
       },
     },
   },
@@ -222,7 +222,7 @@ export const IconOnlyVertical: Story = {
     docs: {
       description: {
         story:
-          'The vertical icon-only variant keeps the same accessible labeling while changing only orientation.',
+          'The icon-only variant turned vertical, with the same accessible labels and a different axis.',
       },
     },
   },

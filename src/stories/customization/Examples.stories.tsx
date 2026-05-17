@@ -36,7 +36,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A curated set of distinct SegmentedChoice customization examples with controls and actions enabled.',
+          'A curated set of SegmentedChoice examples that push the same component into rails, filters, thumbnails, toolbars and switches.',
       },
     },
   },
