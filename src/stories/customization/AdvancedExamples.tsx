@@ -527,6 +527,22 @@ function GlassDockStyles() {
           opacity 120ms ease;
       }
 
+      .glass-dock.rsc-root .rsc-list {
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .glass-dock.rsc-root .rsc-option,
+      .glass-dock.rsc-root .rsc-option-content,
+      .glass-dock.rsc-root .rsc-indicator {
+        clip-path: circle(50% at 50% 50%);
+      }
+
+      .glass-dock.rsc-root .rsc-option,
+      .glass-dock.rsc-root .rsc-indicator {
+        pointer-events: auto;
+      }
+
       .glass-dock.rsc-root .rsc-indicator::after {
         position: absolute;
         inset: 0;
