@@ -485,13 +485,13 @@ hooks.
 
 ### Surface and color
 
-| Variable                  | What it controls                                         |
-| ------------------------- | -------------------------------------------------------- |
-| `--rsc-bg`                | Base background fallback for the control.                |
-| `--rsc-surface`           | Default track/surface fill for the bundled skin.         |
-| `--rsc-border-color`      | Inset border color for the default surface track.        |
-| `--rsc-text-color`        | Default option text color.                               |
-| `--rsc-active-text-color` | Selected, hover, indicator and active option text color. |
+| Variable                  | What it controls                                  |
+| ------------------------- | ------------------------------------------------- |
+| `--rsc-bg`                | Base background fallback for the control.         |
+| `--rsc-surface`           | Default track/surface fill for the bundled skin.  |
+| `--rsc-border-color`      | Inset border color for the default surface track. |
+| `--rsc-text-color`        | Default option text color.                        |
+| `--rsc-active-text-color` | Selected, indicator and active option text color. |
 
 ### Typography
 
@@ -510,7 +510,7 @@ hooks.
 | ------------------------ | ------------------------------------------------------------------- |
 | `--rsc-border-radius`    | Radius for the container track in the bundled skin.                 |
 | `--rsc-container-offset` | Default inset used by the bundled skin.                             |
-| `--rsc-padding`          | List padding; defaults to `--rsc-container-offset`.                 |
+| `--rsc-padding`          | Surface/list inner padding; defaults to `--rsc-container-offset`.   |
 | `--rsc-gap`              | Gap between option slots.                                           |
 | `--rsc-label-gap`        | Gap between label/description content and cloned indicator content. |
 

@@ -431,6 +431,15 @@ export function registerSegmentedChoiceStateContractSuite() {
   );`);
   });
 
+  it('keeps default unselected hover text based on normal option text color', () => {
+    expect(segmentedChoiceCss).toContain(
+      ".rsc-option[data-disabled='false']:not([data-selected='true']):hover"
+    );
+    expect(segmentedChoiceCss).toContain(
+      'color: color-mix(in srgb, var(--rsc-text-color) 84%, var(--rsc-active-text-color));'
+    );
+  });
+
   it('uses smooth indicator geometry transitions by default and routes instant internally', () => {
     const { container: defaultContainer } = render(
       <SegmentedChoice ariaLabel="Default transition" options={baseOptions} />

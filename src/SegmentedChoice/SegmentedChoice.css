@@ -376,9 +376,11 @@
   color: var(--rsc-active-text-color);
 }
 
-.rsc-root[data-disabled='false'] .rsc-option[data-disabled='false']:hover .rsc-option-content {
-  color: var(--rsc-active-text-color);
-  color: color-mix(in srgb, var(--rsc-active-text-color) 84%, var(--rsc-text-color));
+.rsc-root[data-disabled='false']
+  .rsc-option[data-disabled='false']:not([data-selected='true']):hover
+  .rsc-option-content {
+  color: var(--rsc-text-color);
+  color: color-mix(in srgb, var(--rsc-text-color) 84%, var(--rsc-active-text-color));
 }
 
 .rsc-option[data-disabled='true'] .rsc-option-content {

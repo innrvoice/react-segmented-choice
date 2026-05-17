@@ -704,6 +704,12 @@ function ImpressionsStyles() {
           inset 0 1px 0 rgba(255, 255, 255, 0.82);
         box-sizing: border-box;
         border: 4px solid var(--rsc-indicator-color);
+        transition:
+          transform 180ms cubic-bezier(0.24, 1, 0.32, 1),
+          opacity 120ms ease,
+          background-color 160ms ease,
+          border-color 160ms ease,
+          box-shadow 160ms ease;
       }
 
       .impressions .rsc-option-content {
