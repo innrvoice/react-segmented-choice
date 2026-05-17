@@ -442,7 +442,7 @@ export function registerSegmentedChoiceBehaviorSuite() {
           container.querySelector('.rsc-root') as HTMLDivElement,
           '--_rsc-indicator-transform'
         )
-      ).toContain('105px');
+      ).toContain('104px');
     });
   });
 
@@ -1103,6 +1103,45 @@ export function registerSegmentedChoiceBehaviorSuite() {
     await waitFor(() => {
       expect(getCssVar(root, '--_rsc-equal-option-inline-size')).toBe('104px');
       expect(getCssVar(root, '--_rsc-equal-option-block-size')).toBe('32px');
+    });
+  });
+
+  it('drops stale equal sizing before remeasuring after size changes', async () => {
+    const viewOptions = [
+      { value: 'board', label: 'Board' },
+      { value: 'list', label: 'List' },
+      { value: 'timeline', label: 'Timeline' },
+    ];
+    const { container, rerender } = render(
+      <SegmentedChoice ariaLabel="View" defaultValue="timeline" options={viewOptions} size="sm" />
+    );
+
+    const getOptionContents = () => Array.from(container.querySelectorAll('.rsc-option-content'));
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+
+    let optionContents = getOptionContents();
+    setElementRect(optionContents[0] as Element, { left: 0, top: 0, width: 64, height: 32 });
+    setElementRect(optionContents[1] as Element, { left: 64, top: 0, width: 56, height: 32 });
+    setElementRect(optionContents[2] as Element, { left: 120, top: 0, width: 88, height: 32 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-equal-option-inline-size')).toBe('88px');
+    });
+
+    rerender(
+      <SegmentedChoice ariaLabel="View" defaultValue="timeline" options={viewOptions} size="lg" />
+    );
+
+    optionContents = getOptionContents();
+    setElementRect(optionContents[0] as Element, { left: 0, top: 0, width: 92, height: 44 });
+    setElementRect(optionContents[1] as Element, { left: 92, top: 0, width: 80, height: 44 });
+    setElementRect(optionContents[2] as Element, { left: 172, top: 0, width: 116, height: 44 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-equal-option-inline-size')).toBe('116px');
+      expect(getCssVar(root, '--_rsc-equal-option-block-size')).toBe('44px');
     });
   });
 
@@ -2712,7 +2751,7 @@ export function registerSegmentedChoiceBehaviorSuite() {
     await waitFor(() => {
       expect(
         getCssVar(container.querySelector('.rsc-root') as HTMLDivElement, '--_rsc-indicator-width')
-      ).toBe('70px');
+      ).toBe('72px');
     });
 
     fireEvent.click(getRadio('Week'));
@@ -2720,13 +2759,13 @@ export function registerSegmentedChoiceBehaviorSuite() {
     await waitFor(() => {
       expect(
         getCssVar(container.querySelector('.rsc-root') as HTMLDivElement, '--_rsc-indicator-width')
-      ).toBe('114px');
+      ).toBe('116px');
       expect(
         getCssVar(
           container.querySelector('.rsc-root') as HTMLDivElement,
           '--_rsc-indicator-transform'
         )
-      ).toContain('85px');
+      ).toContain('84px');
     });
   });
 
@@ -2761,8 +2800,8 @@ export function registerSegmentedChoiceBehaviorSuite() {
     triggerResizeObservers();
 
     await waitFor(() => {
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('1px');
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('134px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('0px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('136px');
     });
 
     fireEvent.pointerDown(labels[2] as Element, {
@@ -2777,8 +2816,36 @@ export function registerSegmentedChoiceBehaviorSuite() {
     expect(root.dataset.rscIndicatorTransition).toBe('smooth');
 
     await waitFor(() => {
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('315px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('314px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('130px');
+    });
+  });
+
+  it('respects explicit indicator inset for underlay surface geometry', async () => {
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Section"
+        defaultValue="overview"
+        geometry={{ indicator: { inset: 4 } }}
+        options={[
+          { value: 'overview', label: 'Overview' },
+          { value: 'billing', label: 'Billing' },
+        ]}
+      />
+    );
+
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    setElementRect(list, { left: 0, top: 0, width: 280, height: 64 });
+    setElementRect(labels[0] as Element, { left: 0, top: 0, width: 136, height: 64 });
+    setElementRect(labels[1] as Element, { left: 148, top: 0, width: 132, height: 64 });
+    triggerResizeObservers();
+
+    await waitFor(() => {
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('4px');
       expect(getCssVar(root, '--_rsc-indicator-width')).toBe('128px');
+      expect(getCssVar(root, '--_rsc-indicator-height')).toBe('56px');
     });
   });
 
@@ -2801,8 +2868,8 @@ export function registerSegmentedChoiceBehaviorSuite() {
     triggerResizeObservers();
 
     await waitFor(() => {
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('114px');
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('85px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('116px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('84px');
       expect(root.dataset.rscIndicatorMotion).toBeUndefined();
     });
 
@@ -2811,7 +2878,7 @@ export function registerSegmentedChoiceBehaviorSuite() {
     await waitFor(() => {
       expect(root.dataset.rscIndicatorMotion).toBeUndefined();
       expect(root.dataset.rscIndicatorTransition).toBe('smooth');
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('213px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('212px');
     });
   });
 
@@ -2834,8 +2901,8 @@ export function registerSegmentedChoiceBehaviorSuite() {
     triggerResizeObservers();
 
     await waitFor(() => {
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('94px');
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('213px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('96px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('212px');
       expect(root.dataset.rscIndicatorMotion).toBeUndefined();
     });
   });
@@ -2918,8 +2985,8 @@ export function registerSegmentedChoiceBehaviorSuite() {
     triggerResizeObservers();
 
     await waitFor(() => {
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('145px');
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('122px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('144px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('124px');
     });
 
     fireEvent.pointerDown(labels[2] as Element, {
@@ -2936,8 +3003,8 @@ export function registerSegmentedChoiceBehaviorSuite() {
 
     await waitFor(() => {
       expect(onValueChange).toHaveBeenCalledWith('party');
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('281px');
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('90px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('280px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('92px');
       expect(root.dataset.dragging).toBe('false');
       expect(root.dataset.rscDragPreviewing).toBe('false');
     });
@@ -3022,15 +3089,15 @@ export function registerSegmentedChoiceBehaviorSuite() {
     triggerResizeObservers();
 
     await waitFor(() => {
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('70px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('72px');
     });
 
     fireEvent.click(getRadio('Week'));
 
     await waitFor(() => {
       expect(root.dataset.rscIndicatorTransition).toBe('instant');
-      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('114px');
-      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('85px');
+      expect(getCssVar(root, '--_rsc-indicator-width')).toBe('116px');
+      expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('84px');
     });
   });
 
@@ -3075,7 +3142,7 @@ export function registerSegmentedChoiceBehaviorSuite() {
     expect(root.dataset.dragging).toBe('true');
     expect(root.dataset.rscDragPreviewing).toBe('true');
     const dragTransform = getCssVar(root, '--_rsc-indicator-transform');
-    expect(dragTransform).toContain('187px');
+    expect(dragTransform).toContain('186px');
 
     fireEvent.pointerUp(list, {
       clientX: 206,

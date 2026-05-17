@@ -65,28 +65,6 @@ function setForwardedRef<T>(ref: React.ForwardedRef<T>, value: T) {
   }
 }
 
-function resolveIndicatorInsetPx({
-  indicatorInset,
-  selectionMode,
-  trackStyle,
-  unstyled,
-}: {
-  indicatorInset: number | undefined;
-  selectionMode: string;
-  trackStyle: string;
-  unstyled: boolean;
-}) {
-  if (indicatorInset !== undefined) {
-    return indicatorInset;
-  }
-
-  if (!unstyled && selectionMode === 'underlay' && trackStyle === 'surface') {
-    return 1;
-  }
-
-  return 0;
-}
-
 function resolveShouldRenderAnchor({
   anchorHeight,
   anchorWidth,
@@ -263,12 +241,7 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
 
   // Layout flags keep the later hooks/render logic readable without changing behavior.
   const indicatorBorderWidthPx = indicatorConfig.borderWidth ?? 0;
-  const indicatorInsetPx = resolveIndicatorInsetPx({
-    indicatorInset: indicatorConfig.inset,
-    selectionMode,
-    trackStyle: trackConfig.style,
-    unstyled,
-  });
+  const indicatorInsetPx = indicatorConfig.inset ?? 0;
   const indicatorSizeAdjustment =
     indicatorInsetPx * 2 + (indicatorConfig.style === 'ring' ? indicatorBorderWidthPx * 2 : 0);
   const hasExplicitIndicatorSize =
@@ -364,7 +337,26 @@ function InnerSegmentedChoice<T extends SegmentedChoiceValue>(
     orientation,
     trackLayout: trackConfig.layout,
   });
+  const equalDistributionMeasurementKey = useMemo(
+    () =>
+      [
+        optionLayoutConfig.sizing,
+        size,
+        orientation,
+        unstyled ? 'unstyled' : 'styled',
+        options
+          .map(
+            option =>
+              `${option.value}:${typeof option.label === 'string' ? option.label : ''}:${
+                option.description ? 'description' : ''
+              }`
+          )
+          .join('|'),
+      ].join('|'),
+    [optionLayoutConfig.sizing, options, orientation, size, unstyled]
+  );
   const equalDistributionLayout = useEqualDistributionLayout({
+    measurementKey: equalDistributionMeasurementKey,
     optionSizing: optionLayoutConfig.sizing,
     optionContentRefs,
     optionCount: options.length,

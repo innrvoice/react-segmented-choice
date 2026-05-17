@@ -1,17 +1,19 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useObservedMeasurement } from './useObservedMeasurement';
 
 export type EqualDistributionLayout = {
   blockSize: number;
   inlineSize: number;
+  measurementKey: string;
   visible: boolean;
 };
 
-function getInitialLayout(): EqualDistributionLayout {
+function getInitialLayout(measurementKey: string): EqualDistributionLayout {
   return {
     blockSize: 0,
     inlineSize: 0,
+    measurementKey,
     visible: false,
   };
 }
@@ -57,21 +59,39 @@ function measureEqualDistributionLayout({
   return {
     blockSize: Math.max(...sizes.map(size => size.blockSize)),
     inlineSize: Math.max(...sizes.map(size => size.inlineSize)),
-  } satisfies Omit<EqualDistributionLayout, 'visible'>;
+  } satisfies Omit<EqualDistributionLayout, 'measurementKey' | 'visible'>;
 }
 
 export function useEqualDistributionLayout({
+  measurementKey,
   optionSizing,
   optionContentRefs,
   optionCount,
 }: {
+  measurementKey: string;
   optionSizing: 'equal' | 'content' | 'fixed';
   optionContentRefs: React.RefObject<Array<HTMLSpanElement | null>>;
   optionCount: number;
 }) {
-  const [layout, setLayout] = useState<EqualDistributionLayout>(getInitialLayout);
+  const [layout, setLayout] = useState<EqualDistributionLayout>(() =>
+    getInitialLayout(measurementKey)
+  );
+  const layoutIsCurrent = layout.measurementKey === measurementKey;
+  const currentLayout = layoutIsCurrent ? layout : getInitialLayout(measurementKey);
+
+  useEffect(() => {
+    if (layoutIsCurrent) {
+      return;
+    }
+
+    setLayout(getInitialLayout(measurementKey));
+  }, [layoutIsCurrent, measurementKey]);
 
   const measure = useCallback(() => {
+    if (!layoutIsCurrent) {
+      return;
+    }
+
     const measuredLayout = measureEqualDistributionLayout({
       optionSizing,
       optionContentRefs,
@@ -79,15 +99,20 @@ export function useEqualDistributionLayout({
     });
 
     if (!measuredLayout) {
-      setLayout(current => (current.visible ? getInitialLayout() : current));
+      setLayout(current =>
+        current.visible || current.measurementKey !== measurementKey
+          ? getInitialLayout(measurementKey)
+          : current
+      );
       return;
     }
 
     setLayout({
       ...measuredLayout,
+      measurementKey,
       visible: true,
     });
-  }, [optionSizing, optionContentRefs, optionCount]);
+  }, [layoutIsCurrent, measurementKey, optionSizing, optionContentRefs, optionCount]);
 
   const observeElements = useCallback(
     () => optionContentRefs.current.slice(0, optionCount),
@@ -99,5 +124,5 @@ export function useEqualDistributionLayout({
     observeElements,
   });
 
-  return layout;
+  return currentLayout;
 }
