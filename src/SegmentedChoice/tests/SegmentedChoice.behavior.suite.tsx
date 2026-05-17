@@ -1758,6 +1758,52 @@ export function registerSegmentedChoiceBehaviorSuite() {
     ).toContain('scale(1.5)');
   });
 
+  it('does not apply dragScale or preview state on selected overlay pointer hold', () => {
+    const { container } = render(
+      <SegmentedChoice
+        ariaLabel="Range"
+        defaultValue="day"
+        options={baseOptions}
+        geometry={{
+          dragScale: 1.3,
+          indicator: { content: 'clone-active' },
+          mode: 'overlay',
+        }}
+      />
+    );
+
+    const indicator = container.querySelector('.rsc-indicator') as HTMLSpanElement;
+    const list = container.querySelector('.rsc-list') as HTMLDivElement;
+    const root = container.querySelector('.rsc-root') as HTMLDivElement;
+    const labels = Array.from(container.querySelectorAll('.rsc-option'));
+    Object.assign(list, {
+      releasePointerCapture: vi.fn(),
+      setPointerCapture: vi.fn(),
+    });
+    setElementRect(list, { left: 0, top: 0, width: 280, height: 48 });
+    setRectsForAxis(labels, 'horizontal', { size: 84, gap: 12, crossSize: 48 });
+
+    fireEvent.pointerDown(indicator, {
+      button: 0,
+      clientX: 20,
+      clientY: 24,
+      pointerId: 26,
+    });
+
+    expect(root.dataset.dragging).toBe('false');
+    expect(root.dataset.rscDragPreviewing).toBe('false');
+    expect((labels[0] as HTMLElement).dataset.previewed).toBe('false');
+    expect(getCssVar(root, '--_rsc-indicator-transform')).toContain('scale(1)');
+
+    fireEvent.pointerUp(list, {
+      clientX: 20,
+      clientY: 24,
+      pointerId: 26,
+    });
+
+    expect(root.dataset.dragReleased).toBe('false');
+  });
+
   it('keeps the destination drag layout for the first release frame after committing a new value', () => {
     const { container } = render(
       <SegmentedChoice
@@ -1898,6 +1944,11 @@ export function registerSegmentedChoiceBehaviorSuite() {
       fireEvent.pointerDown(labels[0], {
         button: 0,
         clientX: 20,
+        clientY: 24,
+        pointerId: 27,
+      });
+      fireEvent.pointerMove(list, {
+        clientX: 90,
         clientY: 24,
         pointerId: 27,
       });
@@ -2811,7 +2862,7 @@ export function registerSegmentedChoiceBehaviorSuite() {
       pointerId: 81,
     });
 
-    expect(root.dataset.dragging).toBe('true');
+    expect(root.dataset.dragging).toBe('false');
     expect(root.dataset.rscDragPreviewing).toBe('false');
     expect(root.dataset.rscIndicatorTransition).toBe('smooth');
 
@@ -3181,7 +3232,7 @@ export function registerSegmentedChoiceBehaviorSuite() {
       pointerId: 83,
     });
 
-    expect(root.dataset.dragging).toBe('true');
+    expect(root.dataset.dragging).toBe('false');
     expect(root.dataset.rscDragPreviewing).toBe('false');
 
     fireEvent.pointerMove(list, {
