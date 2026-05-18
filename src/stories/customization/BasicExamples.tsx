@@ -221,7 +221,7 @@ function EmojiRingStyles() {
       }
 
       .emoji-ring {
-        width: 250px;
+        width: 286px;
         --rsc-surface: rgba(255, 255, 255, 0.68);
         --rsc-border-color: rgba(203, 213, 225, 0.52);
         --rsc-border-radius: 999px;
@@ -230,7 +230,8 @@ function EmojiRingStyles() {
       }
 
       .emoji-ring .rsc-list {
-        width: 250px;
+        width: 100%;
+        box-sizing: border-box;
         justify-content: space-between;
         align-items: center;
       }
@@ -326,6 +327,9 @@ function EmojiRingStyles() {
 }
 
 export const EmojiRing: LooseStory = {
+  args: {
+    optionSizing: 'content',
+  },
   render: function Render(args) {
     const [value, onValueChange] = useStoryValue('hm', args.onValueChange);
 
