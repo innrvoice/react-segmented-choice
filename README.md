@@ -3,6 +3,14 @@
 [![codecov](https://codecov.io/gh/innrvoice/react-segmented-choice/branch/main/graph/badge.svg)](https://codecov.io/gh/innrvoice/react-segmented-choice)
 [![bundle size](https://codecov.io/github/innrvoice/react-segmented-choice/branch/main/graph/bundle/react-segmented-choice-esm/badge.svg)](https://app.codecov.io/github/innrvoice/react-segmented-choice/bundles/main/react-segmented-choice-esm)
 
+<p align="center">
+  <img
+    src="https://segmentedchoice.visiofutura.com/rsc-example.gif"
+    alt="react-segmented-choice examples preview"
+    width="500"
+  />
+</p>
+
 `react-segmented-choice` is a React segmented control for choices that should feel like real UI, not styled tabs.
 
 It keeps the boring parts in place: native radio semantics, keyboard behavior, form-friendly state and drag-to-select. From there, you can shape the same component into a switch, toolbar, option picker, rail or compact mode control with CSS and measured geometry.
@@ -303,6 +311,31 @@ It covers:
 - styling examples built only on the documented public API
 
 Run it locally with `pnpm storybook`, or browse the hosted examples at [sb.segmentedchoice.visiofutura.com](https://sb.segmentedchoice.visiofutura.com/).
+
+For quick forks, the main examples are also available on CodeSandbox.
+
+<details>
+<summary>Open CodeSandbox examples</summary>
+
+- [Basic Example](https://codesandbox.io/p/sandbox/tender-albattani-5rpn94)
+- [Primary Scale](https://codesandbox.io/p/sandbox/react-segmented-choice-primary-scale-5rj8n7)
+- [Emoji Ring](https://codesandbox.io/p/sandbox/react-segmented-choice-emoji-ring-xpwhc5)
+- [Tip Selector](https://codesandbox.io/p/sandbox/react-segmented-choice-tip-selector-hy6qkn)
+- [Impressions](https://codesandbox.io/p/sandbox/react-segmented-choice-impressions-fccry2)
+- [Range-like](https://codesandbox.io/p/sandbox/react-segmented-choice-range-like-8hjh4g)
+- [Modern Thumbnail](https://codesandbox.io/p/sandbox/react-segmented-choice-modern-thumbnail-x7mf2m)
+- [Camera Modes](https://codesandbox.io/p/sandbox/react-segmented-choice-camera-modes-clone-active-v3jct6)
+- [Ant-style Filter Bar](https://codesandbox.io/p/sandbox/react-segmented-choice-ant-style-filter-bar-97y7fl)
+- [Spotify Mood Mixer](https://codesandbox.io/p/sandbox/react-segmented-choice-spotify-mood-mixer-d6mls4)
+- [Glass Dock](https://codesandbox.io/p/sandbox/react-segmented-choice-glass-dock-njnng8)
+- [Arcade Difficulty](https://codesandbox.io/p/sandbox/react-segmented-choice-arcade-difficulty-krwrp3)
+- [Command Scope Picker](https://codesandbox.io/p/sandbox/react-segmented-choice-command-scope-picker-9r539y)
+- [Figma Tool Rail](https://codesandbox.io/p/sandbox/react-segmented-choice-figma-tool-rail-m35cgv)
+- [Editorial Tone Selector](https://codesandbox.io/p/sandbox/react-segmented-choice-editorial-tone-selector-qys8zk)
+- [Android-like Toggle](https://codesandbox.io/p/sandbox/react-segmented-choice-android-like-toggle-4vjmk5)
+- [iOS-like Toggle](https://codesandbox.io/p/sandbox/react-segmented-choice-ios-like-toggle-ymm9xd)
+
+</details>
 
 ## Browser Support
 
