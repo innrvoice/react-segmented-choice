@@ -1,6 +1,6 @@
-# SegmentedChoice API Reference
+# React Segmented Control API Reference
 
-The README gets you to a working control. This file is for the parts that matter once you start fitting it into a real interface: value ownership, geometry, slot hooks, CSS customization and the few sharp edges worth knowing.
+`SegmentedChoice` is the `react-segmented-choice` React segmented control component for web interfaces. The README gets you to a working control; this file is for the parts that matter once you start fitting it into a real interface: value ownership, geometry, slot hooks, CSS customization and the few sharp edges worth knowing.
 
 If you only need the default segmented control, the README is probably enough. If you are changing layout mechanics, wiring analytics attrs, building a custom skin or using the component in forms, this reference is meant to answer the "what owns this?" questions.
 
@@ -106,6 +106,8 @@ The surface width itself still comes from normal CSS layout. Without an explicit
 - `ariaDescribedby?: string`
 
 Use at least one group labelling strategy: `ariaLabel` or `ariaLabelledby`.
+
+The rendered control uses labelled radio-group semantics and HTML radio inputs, so screen readers and forms receive a real single-choice control.
 
 ### Styling Entry Points
 
@@ -408,7 +410,7 @@ Use `.rsc-root` or your own root `className` to scope a theme.
 Use `.rsc-option`, `.rsc-option-content`, `.rsc-option-label` and `.rsc-option-description` for option styling.
 Use `.rsc-track`, `.rsc-indicator`, `.rsc-indicator-content` and `.rsc-option-anchor` for geometry-driven visuals such as rails, handles, cloned content, anchors, rings or release feedback.
 
-The `.rsc-option-input` hook exists because the native radio input is part of the public DOM structure. In normal styling, leave that input visually hidden and style the visible option slots instead.
+The `.rsc-option-input` hook exists because the HTML radio input is part of the public DOM structure. In normal styling, leave that input visually hidden and style the visible option slots instead.
 
 Class hooks describe structure. Data attributes describe state. In most custom themes, use both together:
 
@@ -560,7 +562,7 @@ Internal:
 
 Do not build app-level styling contracts on `--_rsc-*` or `data-rsc-*`.
 
-## Practical Examples
+## React Segmented Control Examples
 
 These examples stay close to the API reference. For more visual recipes, run Storybook with `pnpm storybook` or browse the hosted build at [sb.segmentedchoice.visiofutura.com](https://sb.segmentedchoice.visiofutura.com/).
 
@@ -618,7 +620,7 @@ Use uncontrolled mode when the control can own its selected value after the firs
 
 When `label` is not readable text, provide `ariaLabel` on the option. The group itself still needs `ariaLabel` or `ariaLabelledby`.
 
-### 4) Overlay with non-square indicator and anchor
+### 4) Sliding indicator with non-square anchor
 
 ```tsx
 <SegmentedChoice
@@ -742,7 +744,7 @@ Use `clone-active` when the moving overlay should carry the active option conten
 
 `data-selected` is the committed value. `data-previewed` is the drag target and appears only while dragging.
 
-### 8) CSS-first theming
+### 8) CSS variables theming
 
 ```tsx
 <SegmentedChoice
@@ -767,7 +769,7 @@ Use `clone-active` when the moving overlay should carry the active option conten
 }
 ```
 
-### 9) `unstyled` with custom CSS
+### 9) Unstyled segmented control with custom CSS
 
 ```tsx
 <SegmentedChoice

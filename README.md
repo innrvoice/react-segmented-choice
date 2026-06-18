@@ -6,20 +6,20 @@
 <p align="center">
   <img
     src="https://segmentedchoice.visiofutura.com/rsc-example.gif"
-    alt="react-segmented-choice examples preview"
+    alt="React segmented control examples with sliding indicators, pill switches and option pickers"
     width="500"
   />
 </p>
 
-`react-segmented-choice` is a React segmented control for choices that should feel like real UI, not styled tabs.
+`react-segmented-choice` is a React segmented control component for web apps that need accessible single-choice UI without falling back to styled tabs.
 
-It keeps the boring parts in place: native radio semantics, keyboard behavior, form-friendly state and drag-to-select. From there, you can shape the same component into a switch, toolbar, option picker, rail or compact mode control with CSS and measured geometry.
+It keeps the boring parts in place: HTML radio inputs, labelled radio-group semantics, keyboard behavior, form-friendly state and drag-to-select. From there, you can shape the same component into segmented buttons, sliding pill switches, toolbar controls, option pickers, tab-like UI or compact mode selectors with a sliding indicator, CSS variables and measured geometry.
 
 Typical use cases:
 
-- report ranges, billing periods, density switches and mode pickers
-- icon rails and compact toolbars where every option needs a stable target
-- custom switches or tabs alternatives that should still behave like form controls
+- report ranges, billing periods, density switches and mode selectors
+- segmented buttons, icon rails and toolbar controls where every option needs a stable target
+- sliding pill switches, option pickers and tab-like UI that should still behave like form controls
 
 The hosted [Storybook](https://sb.segmentedchoice.visiofutura.com/) shows the range: plain controls, rails, thumbnails, filters, toggles and the geometry stories behind them.
 
