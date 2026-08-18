@@ -1,9 +1,16 @@
+.git
+.githooks
+.github
+.DS_Store
+.env
+.env.*
 node_modules
 lib
 storybook-static
 coverage
 test-results
 playwright-report
-.DS_Store
+codesandbox
+*.log
 AGENTS.md
 CONTINUITY.md
