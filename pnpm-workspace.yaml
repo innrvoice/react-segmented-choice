@@ -19,6 +19,6 @@ minimumReleaseAgeExclude:
   - storybook@10.4.6
   - tsdown@0.22.3
 overrides:
-  '@actions/github>undici': 7.24.7
-  '@actions/http-client>undici': 7.24.7
+  '@actions/github>undici': 7.29.1
+  '@actions/http-client>undici': 7.29.1
   picomatch: ^4.0.4
